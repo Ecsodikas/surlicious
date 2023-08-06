@@ -50,7 +50,6 @@ public class ConnectionStore
     public Connections getConnections(string userId)
     {
         MongoCollection connections = this.getUserConnectionsCollection();
-
         auto result = connections.findOne([
             "user_id": BsonObjectID.fromString(userId),
         ], FindOptions.init);
@@ -65,7 +64,6 @@ public class ConnectionStore
 
     public void removeConnection(BsonObjectID connectionId, string userId)
     {
-        import std.stdio;
         MongoCollection connections = this.getUserConnectionsCollection();
 
         auto r = connections.replaceOne([
@@ -73,8 +71,6 @@ public class ConnectionStore
             "connections._id": connectionId
         ],
         ["$pull": ["connections": ["_id": connectionId]]]);
-        
-        r.writeln;
     }
 
     public void addConnection(string name, string userId)
@@ -99,6 +95,7 @@ public class ConnectionStore
         Connection c = Connection(
             BsonObjectID.generate(),
             name,
+            DateTime.init,
             false
         );
 
@@ -120,11 +117,6 @@ public class ConnectionStore
         MongoCollection connections = this.getUserConnectionsCollection();
         BsonObjectID userIdBOI = BsonObjectID.fromString(userId);
         BsonObjectID oldKeyBOI = BsonObjectID.fromString(oldKey);
-
-        import std;
-
-        userIdBOI.writeln;
-        oldKeyBOI.writeln;
 
         UpdateOptions uo;
         uo.upsert = true;

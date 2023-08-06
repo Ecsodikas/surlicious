@@ -11,12 +11,19 @@ block content
                 input.input(readonly, name="api_key", value='#{connections.api_key.toString()}')
             p
                 .buttons.is-right
-                    button.button.is-warning(type="submit") Generate new API key
+                    button.button.is-warning(type="submit", onclick="return confirm('Are you sure you want to revoke your API key and create another one?')") Generate new API key
+
+    
 
 
     -foreach(c; connections.connections)
         .box(style=c.isActive ? "background: #eaffe8" : "background: #fff5d6")
             h2= c.name
+            p= "Last heartbeat: " ~ (c.heartbeat.toISOExtString() != "0001-01-01T00:00:00" ? c.heartbeat.toISOExtString() : "none" )
+            form(method="post", action="/removeconnection")
+                input.input(name="connection_id", type="hidden", value='#{c._id}')
+                .buttons.is-right
+                    button.button.is-danger(type="submit", onclick="return confirm('Are you sure you want to remove the connection?')") Remove connection
             form(method="post", action="/setconnectionstatus")
                 p 
                     label(for="id") Id
@@ -30,8 +37,3 @@ block content
                             | Inactive
                 p
                     button.button(type="submit") Update connection
-            form(method="post", action="/removeconnection")
-                input.input(name="connection_id", type="hidden", value='#{c._id}')
-                button.button(type="submit") Remove connection
-            
-

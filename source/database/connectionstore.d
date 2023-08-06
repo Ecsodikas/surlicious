@@ -65,17 +65,17 @@ public class ConnectionStore
 
     public void removeConnection(BsonObjectID connectionId, string userId)
     {
-        // TODO: Make it worky worky
+        import std.stdio;
         MongoCollection connections = this.getUserConnectionsCollection();
+
         auto r = connections.replaceOne([
             "user_id": BsonObjectID.fromString(userId),
             "connections._id": connectionId
-            ],
-            ["$pull": ["connections._id": connectionId]]);
-        import std;
-            r.writeln;
+        ],
+        ["$pull": ["connections": ["_id": connectionId]]]);
+        
+        r.writeln;
     }
-
 
     public void addConnection(string name, string userId)
     {

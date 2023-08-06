@@ -1,0 +1,37 @@
+extends layout
+
+block content
+    h1 Connections
+    - if (connections.connections.length < 5)
+        a(href="/addconnection") Add Connection
+    .box()
+        h2 Api Key
+        form(method="post", action="/recreateapikey")
+            p
+                input.input(readonly, name="api_key", value='#{connections.api_key.toString()}')
+            p
+                .buttons.is-right
+                    button.button.is-warning(type="submit") Generate new API key
+
+
+    -foreach(c; connections.connections)
+        .box(style=c.isActive ? "background: #eaffe8" : "background: #fff5d6")
+            h2= c.name
+            form(method="post", action="/setconnectionstatus")
+                p 
+                    label(for="id") Id
+                    input.input(name="connection_id", type="text", required, readonly, value='#{c._id}')
+                p 
+                    label(for="status") Status
+                    select.input(name="status")
+                        option(value="true", selected=c.isActive ? "selected" : null)
+                            | Active
+                        option(value="false", selected=!c.isActive ? "selected" : null)
+                            | Inactive
+                p
+                    button.button(type="submit") Update connection
+            form(method="post", action="/removeconnection")
+                input.input(name="connection_id", type="hidden", value='#{c._id}')
+                button.button(type="submit") Remove connection
+            
+

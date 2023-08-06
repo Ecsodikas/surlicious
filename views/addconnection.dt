@@ -1,0 +1,13 @@
+extends layout
+
+block content
+    h1 Add Connection
+    .box
+        form(method="post", action="/addconnection")
+            fieldset
+                legend Add a new connection to surveil
+                p 
+                    label(for="name") Name
+                    input.input(name="name", type="text", required)
+                p
+                    button.button(type="submit") Create Connection

@@ -1,0 +1,62 @@
+doctype html
+
+html(lang="en", style="height: 100%;")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        meta(http-equiv="X-UA-Compatible", content="ie=edge")
+        link(rel='stylesheet', type='text/css', href='css/bulma.css')
+        title Surlicious
+    body(style="height: 100%;")
+        nav.navbar(role='navigation', aria-label="main navigation")
+            .navbar-brand
+                a.navbar-item(href='/')
+                    img(src="surlicious_text.png", style="max-height: 5rem;")
+                
+                a.navbar-burger(role='button', aria-label='menu', aria-expanded='false', data-target='navbarBasicExample')
+                    span(aria-hidden='true')
+                    span(aria-hidden='true')
+                    span(aria-hidden='true')
+            #navbar.navbar-menu
+                .navbar-start
+                    a.navbar-item(href="/")
+                        | Home
+                    - if (currentUser.loggedIn)
+                        a.navbar-item(href="/dashboard")
+                            | Dashboard
+                        a.navbar-item(href="/connections")
+                            | Connections
+                    a.navbar-item(href="/documentation")
+                        | Documentation
+                .navbar-end
+                    - if (!currentUser.loggedIn)
+                        .navbar-item
+                            .buttons
+                            a.button.is-primary(href="/register")
+                                strong Sign up
+                            a.button.is-light(href="/login")
+                                | Log in
+                    - else
+                        .navbar-item.has-dropdown.is-hoverable
+                            a.navbar-link
+                                p=currentUser.name
+                            .navbar-dropdown
+                                a.navbar-item(href="/settings")
+                                    | Settings
+                                hr.navbar-divider
+                                a.navbar-item(href="/logout")
+                                    strong Logout
+        -if(_error)
+            article.message.is-danger
+                .message-header
+                    p Error
+                .message-body
+                    p= _error
+        .columns(style="height: 100%;")
+            .column
+            .column.is-three-quarters.content
+                block content
+            .column
+
+
+        

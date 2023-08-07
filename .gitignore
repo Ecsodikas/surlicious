@@ -1,4 +1,5 @@
 .dub
+.mailcreds
 docs.json
 __dummy.html
 docs/

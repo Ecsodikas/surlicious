@@ -1,5 +1,9 @@
 module helpers.mail;
 
+import std.stdio;
+import std.algorithm;
+import std.array;
+
 import vibe.vibe;
 import models.user;
 
@@ -16,8 +20,10 @@ public static void sendMailTo(User user, string subject, string content) {
     ms.connectionType = SMTPConnectionType.tls;
     ms.authType = SMTPAuthType.login;
     ms.tlsValidationMode = TLSPeerValidationMode.none;
-    ms.username = "exodiquas@exomie.eu";
-    ms.password = "5Hz(TXysa.c(Fv>a";
+    File f = File(".mailcreds");
+    dchar[][] creds = f.byLine().map!array.array();
+    ms.username = creds[0].to!string;
+    ms.password = creds[1].to!string;
 
     sendMail(ms, email);
 }

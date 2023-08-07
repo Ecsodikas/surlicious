@@ -4,8 +4,8 @@
 	],
 	"copyright": "Copyright © 2023, Timo Netzer",
 	"dependencies": {
-		"vibe-d": "~>0.9",
-		"vibe-d:crypto": "~>0.9.6"
+		"arsd-official": "~>10.9.10",
+		"vibe-d": "~>0.9"
 	},
 	"description": "A simple vibe.d server application.",
 	"license": "proprietary",

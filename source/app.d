@@ -16,6 +16,8 @@ import controller.usercontroller;
 import controller.dashboardcontroller;
 import controller.settingscontroller;
 import controller.connectionscontroller;
+import helpers.mail;
+
 
 class SurliciousApplication
 {
@@ -177,7 +179,7 @@ class SurliciousApplication
 }
 
 void main()
-{
+{	
 	auto router = new URLRouter();
 	router.registerWebInterface(new SurliciousApplication());
 	router.get("*", serveStaticFiles("public/"));

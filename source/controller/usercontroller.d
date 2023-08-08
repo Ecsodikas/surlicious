@@ -24,6 +24,20 @@ public class UserController
 		render!("login.dt", currentUser, _error);
 	}
 
+	public void validateAccount(string activationHash)
+	{
+		UserStore us = Database.getUserStore();
+		User u = us.getUserByActivationHash(activationHash);
+
+		if(u.isActivated || u._id == BsonObjectID.init) {
+			//TODO: Error handling
+			redirect("login");
+		}
+
+		us.activateAccount(activationHash);
+		redirect("login");
+	}
+
 	void getRegister(string _error)
 	{
 		auto currentUser = this.user;
@@ -39,6 +53,8 @@ public class UserController
 	void postRegister(HTTPServerRequest req, HTTPServerResponse res)
 	{
 		import std.digest.sha;
+		import std.digest.md;
+		import std.uuid;
 		import std.conv;
 		import std.stdio;
 		import std.algorithm;
@@ -46,6 +62,8 @@ public class UserController
 		import std.random;
 		import std.range;
 		import std.net.isemail;
+
+		import helpers.mail;
 
 		auto formdata = req.form;
 		string email = formdata.get("email");
@@ -86,9 +104,14 @@ public class UserController
 		auto sha1 = new SHA1Digest();
 		string passwordHash = sha1.digest(password1 ~ salt).toHexString();
 		auto id = BsonObjectID.generate();
-		us.storeUser(id, email, name, passwordHash, salt);
+
+		string activatonHash = randomUUID.toString();
+
+		User newUser = User(id, email, name, passwordHash, salt, false, activatonHash);
+		us.storeUser(newUser);
+		sendActivationMail(newUser);
 		ConnectionStore cs = Database.getConnectionStore();
-		cs.storeConnections(Connections(id, BsonObjectID.generate(), []));		
+		cs.storeConnections(Connections(id, BsonObjectID.generate(), []));
 
 		redirect("/login");
 	}
@@ -119,6 +142,7 @@ public class UserController
 			UserData ud;
 			ud.loggedIn = true;
 			ud.name = u.name;
+			ud.isActive = u.isActivated;
 			ud.uuid = u._id.toString();
 
 			req.session.set!UserData("user", ud);

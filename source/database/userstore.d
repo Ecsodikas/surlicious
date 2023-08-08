@@ -14,10 +14,33 @@ public class UserStore
         this.databaseName = databaseName;
     }
 
-    void storeUser(BsonObjectID id, string email, string name, string passwordHash, string salt)
+    void storeUser(User u)
     {
         MongoCollection users = this.mongoClient.getDatabase(this.databaseName)["Users"];
-        users.insertOne(User(id, email, name, passwordHash, salt));
+        users.insertOne(u);
+    }
+
+    void activateAccount(string activationHash)
+    {
+        MongoCollection users = this.mongoClient.getDatabase(this.databaseName)["Users"];
+        auto result = users.replaceOne([
+            "activationHash": activationHash
+        ],
+        ["$set": ["isActivated": true]]);
+    }
+
+    User getUserByActivationHash(string activationHash)
+    {
+        MongoCollection users = this.mongoClient.getDatabase(this.databaseName)["Users"];
+        auto result = users.findOne([
+            "activationHash": activationHash
+        ]);
+
+        if(result.isNull) {
+            return User.init;
+        }
+
+        return result.deserializeBson!User();
     }
 
     User getUserByEmail(string email)

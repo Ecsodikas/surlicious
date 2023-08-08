@@ -6,7 +6,7 @@ public struct Connection
 {
     BsonObjectID _id;
     string name;
-    DateTime heartbeat;
+    long heartbeat;
     bool isActive = false;
 }
 

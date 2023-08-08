@@ -2,3 +2,18 @@ extends layout
 
 block content
     h1 Settings
+    - if (currentUser.isActive)
+        article.message.is-primary
+            .message-header
+                p Account Status
+            .message-body
+                p Account is activated
+    - else 
+        article.message.is-danger
+            .message-header
+                p Account Status
+            .message-body
+                p Account is not activated
+                form(method="post", action="/resendactivationmail")
+                    input.input(name="user_id", type="hidden", value="#{currentUser.uuid}", required)
+                    button.button(type="submit") Resend activation Mail

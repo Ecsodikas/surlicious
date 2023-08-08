@@ -4,11 +4,13 @@ import vibe.vibe;
 import database.database;
 import database.userstore;
 import database.connectionstore;
+
 // Models
 import models.connection;
 import models.user;
 import models.userdata;
 import models.heartbeat;
+
 // Controllers
 import controller.homecontroller;
 import controller.documentationcontroller;
@@ -17,7 +19,6 @@ import controller.dashboardcontroller;
 import controller.settingscontroller;
 import controller.connectionscontroller;
 import helpers.mail;
-
 
 class SurliciousApplication
 {
@@ -31,9 +32,11 @@ class SurliciousApplication
 		}
 		return user.uuid;
 	}
+
 	private enum auth = before!ensureAuth("_authUser");
 
-	private void getError(HTTPServerResponse res, string _error = null) {
+	private void getError(HTTPServerResponse res, string _error = null)
+	{
 		res.writeBody(_error);
 	}
 
@@ -42,7 +45,7 @@ class SurliciousApplication
 	// Home
 	@method(HTTPMethod.GET)
 	void index()
-	{	
+	{
 		auto hc = new HomeController(this.user.value);
 		hc.index();
 	}
@@ -50,7 +53,7 @@ class SurliciousApplication
 	// Documentation
 	@method(HTTPMethod.GET)
 	void documentation()
-	{	
+	{
 		auto dc = new DocumentationController(this.user.value);
 		dc.index();
 
@@ -72,8 +75,8 @@ class SurliciousApplication
 	}
 
 	@method(HTTPMethod.POST)
-	@errorDisplay!getLogin
-	void login(HTTPServerRequest req, HTTPServerResponse res) {
+	@errorDisplay!getLogin void login(HTTPServerRequest req, HTTPServerResponse res)
+	{
 		auto uc = new UserController(this.user.value);
 		uc.postLogin(req, res);
 	}
@@ -85,9 +88,17 @@ class SurliciousApplication
 		uc.getRegister(_error);
 	}
 
+	@method(HTTPMethod.GET)
+	@path("validateaccount/:hash")
+	void getValidateAccount(HTTPServerRequest req)
+	{
+		string activationHash = req.params["hash"];
+		auto uc = new UserController(this.user.value);
+		uc.validateAccount(activationHash);
+	}
+
 	@method(HTTPMethod.POST)
-	@errorDisplay!getRegister
-	void register(HTTPServerRequest req, HTTPServerResponse res)
+	@errorDisplay!getRegister void register(HTTPServerRequest req, HTTPServerResponse res)
 	{
 		auto uc = new UserController(this.user.value);
 		uc.postRegister(req, res);
@@ -99,7 +110,7 @@ class SurliciousApplication
 	@auth
 	@method(HTTPMethod.GET)
 	void dashboard(string _authUser)
-	{	
+	{
 		auto dc = new DashboardController(this.user.value);
 		dc.index();
 	}
@@ -112,12 +123,12 @@ class SurliciousApplication
 		auto sc = new SettingsController(this.user.value);
 		sc.index();
 	}
-	
+
 	// Connections
 	@auth
 	@method(HTTPMethod.GET)
 	void connections(string _authUser)
-	{	
+	{
 		auto cc = new ConnectionsController(this.user.value);
 		cc.index(_authUser);
 	}
@@ -125,7 +136,8 @@ class SurliciousApplication
 	@auth
 	@method(HTTPMethod.GET)
 	@path("addconnection")
-	void getAddConnection(string _authUser, string _error) {	
+	void getAddConnection(string _authUser, string _error)
+	{
 		auto cc = new ConnectionsController(this.user.value);
 		cc.getAddConnection(_authUser, _error);
 	}
@@ -133,14 +145,15 @@ class SurliciousApplication
 	@auth
 	@method(HTTPMethod.POST)
 	@path("removeconnection")
-	void removeConnection(HTTPServerRequest req, HTTPServerResponse res, string _authUser) {	
+	void removeConnection(HTTPServerRequest req, HTTPServerResponse res, string _authUser)
+	{
 		auto cc = new ConnectionsController(this.user.value);
 		cc.postRemoveConnection(req, res, _authUser);
 	}
 
 	@auth
 	@method(HTTPMethod.POST)
-	void recreateapikey(HTTPServerRequest req, HTTPServerResponse res, string _authUser) 
+	void recreateapikey(HTTPServerRequest req, HTTPServerResponse res, string _authUser)
 	{
 		auto cc = new ConnectionsController(this.user.value);
 		cc.postRecreateApiKey(req, res, _authUser);
@@ -148,7 +161,7 @@ class SurliciousApplication
 
 	@auth
 	@method(HTTPMethod.POST)
-	void setconnectionstatus(HTTPServerRequest req, HTTPServerResponse res, string _authUser) 
+	void setconnectionstatus(HTTPServerRequest req, HTTPServerResponse res, string _authUser)
 	{
 		auto cc = new ConnectionsController(this.user.value);
 		cc.postSetConnectionStatus(req, res, _authUser);
@@ -156,15 +169,15 @@ class SurliciousApplication
 
 	@auth
 	@method(HTTPMethod.POST)
-	@errorDisplay!getAddConnection
-	void addconnection(HTTPServerRequest req, HTTPServerResponse res, string _authUser) {
+	@errorDisplay!getAddConnection void addconnection(HTTPServerRequest req, HTTPServerResponse res, string _authUser)
+	{
 		auto cc = new ConnectionsController(this.user.value);
 		cc.postAddConnection(req, res, _authUser);
 	}
 
 	@method(HTTPMethod.POST)
-	void heartbeat(HTTPServerRequest req, HTTPServerResponse res) 
-	{	
+	void heartbeat(HTTPServerRequest req, HTTPServerResponse res)
+	{
 		/** 
 		 * {
     	 *	  "dateTime": "2018-01-01T12:30:10"
@@ -179,7 +192,7 @@ class SurliciousApplication
 }
 
 void main()
-{	
+{
 	auto router = new URLRouter();
 	router.registerWebInterface(new SurliciousApplication());
 	router.get("*", serveStaticFiles("public/"));

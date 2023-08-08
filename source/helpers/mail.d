@@ -7,12 +7,25 @@ import std.array;
 import vibe.vibe;
 import models.user;
 
-public static void sendMailTo(User user, string subject, string content) {
+public static void sendActivationMail(User user)
+{
+    //TODO: Add base URL env
+    string activationURL = "http://127.0.0.1:8080/" ~ "validateaccount/" ~ user.activationHash;
+    sendMailTo(
+        user,
+        "Account activation",
+        "Please click the following link to activate your account: " ~ activationURL
+    );
+}
+
+private static void sendMailTo(User user, string subject, string content)
+{
     Mail email = new Mail;
-    email.headers["Date"] = Clock.currTime(PosixTimeZone.getTimeZone("Europe/Berlin")).toRFC822DateTimeString();
+    email.headers["Date"] = Clock.currTime(PosixTimeZone.getTimeZone("Europe/Berlin"))
+        .toRFC822DateTimeString();
     email.headers["Sender"] = "Surlicious <exodiquas@exomie.eu>";
     email.headers["From"] = "Surlicious <exodiquas@exomie.eu>";
-    email.headers["To"] = user.name ~  "<" ~ user.email ~ ">";
+    email.headers["To"] = user.name ~ "<" ~ user.email ~ ">";
     email.headers["Subject"] = subject;
     email.bodyText = content;
 
@@ -27,4 +40,3 @@ public static void sendMailTo(User user, string subject, string content) {
 
     sendMail(ms, email);
 }
-

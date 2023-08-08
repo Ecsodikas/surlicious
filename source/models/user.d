@@ -10,5 +10,6 @@ struct User
     string name;
     string password;
     string salt;
-    bool isActivated = false;
+    bool isActivated;
+    string activationHash;
 }

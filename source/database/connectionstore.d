@@ -36,13 +36,17 @@ public class ConnectionStore
 
     public void getConnectionsByHeartbeat(Heartbeat heartbeat)
     {
+        import std.datetime.systime;
+
+        long hnsecs = Clock.currStdTime();
+
         MongoCollection connections = this.getUserConnectionsCollection();
         auto result = connections.replaceOne([
             "api_key": BsonObjectID.fromString(heartbeat.apiKey),
             "connections._id": BsonObjectID.fromString(heartbeat.connectionId)
         ], [
             "$set": [
-                "connections.$.heartbeat": heartbeat.dateTime.toISOExtString()
+                "connections.$.heartbeat": hnsecs
             ]
         ]);
     }
@@ -95,7 +99,7 @@ public class ConnectionStore
         Connection c = Connection(
             BsonObjectID.generate(),
             name,
-            DateTime.init,
+            0,
             false
         );
 

@@ -106,8 +106,8 @@ public class UserController
 		auto id = BsonObjectID.generate();
 
 		string activatonHash = randomUUID.toString();
-
-		User newUser = User(id, email, name, passwordHash, salt, false, activatonHash);
+		DateTime now = Clock.currTime().to!DateTime;
+		User newUser = User(id, email, name, passwordHash, salt, false, activatonHash, now);
 		us.storeUser(newUser);
 		sendActivationMail(newUser);
 		ConnectionStore cs = Database.getConnectionStore();

@@ -12,4 +12,5 @@ struct User
     string salt;
     bool isActivated;
     string activationHash;
+    DateTime lastActivationMail;
 }

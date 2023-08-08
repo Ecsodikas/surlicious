@@ -58,6 +58,14 @@ public class UserStore
         return result.deserializeBson!User();
     }
 
+    void updateLastActivationTime(User u, DateTime time) {
+        MongoCollection users = this.mongoClient.getDatabase(this.databaseName)["Users"];
+        users.replaceOne([
+            "_id": u._id 
+        ],
+        ["$set": ["lastActivationMail": time]]);
+    }
+
     User getUserById(string id)
     {
         MongoCollection users = this.mongoClient.getDatabase(this.databaseName)["Users"];

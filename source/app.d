@@ -124,6 +124,15 @@ class SurliciousApplication
 		sc.index();
 	}
 
+	@auth
+	@method(HTTPMethod.POST)
+	@path("resendactivationmail")
+	void resendActivationMail(HTTPServerRequest req, HTTPServerResponse res, string _authUser)
+	{
+		auto sc = new SettingsController(this.user.value);
+		sc.resendActivationMail(_authUser);
+	}
+
 	// Connections
 	@auth
 	@method(HTTPMethod.GET)

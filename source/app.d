@@ -204,5 +204,9 @@ void main()
 	settings.bindAddresses = ["::1", "127.0.0.1"];
 	listenHTTP(settings, router);
 	logInfo("Please open http://127.0.0.1:8080/ in your browser.");
+	
+	import helpers.surveilance;
+	initialisePeriodicSurveilance();
+	
 	runApplication();
 }

@@ -20,6 +20,19 @@ public class ConnectionStore
         return this.mongoClient.getDatabase(this.databaseName)["UserConnections"];
     }
 
+    public MongoCollection getFlatLineConnections()
+    {
+        import std;
+
+        MongoCollection connections = this.getUserConnectionsCollection();
+
+        long hnsecs = Clock.currStdTime();
+        long fiveMinutes = dur!"minutes"(5).total!"hnsecs";
+        auto diff = hnsecs - fiveMinutes;
+  
+        return connections;
+    }
+
     public void setConnectionStatus(string isActive, string userId, string connectionId)
     {
         MongoCollection connections = this.getUserConnectionsCollection();

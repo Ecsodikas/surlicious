@@ -68,4 +68,9 @@ public class ConnectionsController
 		cs.getConnectionsByHeartbeat(heartbeat);
 
 	}
+
+	void sendAlertMails() {
+		ConnectionStore cs = Database.getConnectionStore();
+		cs.getFlatLineConnections();
+	}
 }

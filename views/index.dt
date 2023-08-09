@@ -5,3 +5,7 @@ block content
     h2 Don't trust your APIs!
     p Even we monitor Surlicious with Surlicious.
     p Best tool to get alerts if your API is offline for a given period of time. lol
+
+    - if(req.session)
+        - import models.authinfo;
+        p= req.session.get!AuthInfo("auth")

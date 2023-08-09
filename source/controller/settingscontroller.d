@@ -2,7 +2,7 @@ module controller.settingscontroller;
 
 import vibe.vibe;
 
-import models.userdata;
+import models.authinfo;
 import database.database;
 import database.userstore;
 import models.user;
@@ -10,18 +10,10 @@ import helpers.mail;
 
 public class SettingsController
 {
-	UserData user;
-
-	public this(UserData user)
-	{
-		this.user = user;
-	}
-
 	void index()
 	{
-		auto currentUser = this.user;
-		string _error = null;
-		render!("settings.dt", currentUser, _error);
+		string error = null;
+		render!("settings.dt", error);
 	}
 
 	void resendActivationMail(string userId)

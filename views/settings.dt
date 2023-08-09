@@ -1,8 +1,9 @@
 extends layout
 
 block content
+    - import models.authinfo;
     h1 Settings
-    - if (currentUser.isActive)
+    - if (req.session && req.session.get!AuthInfo("auth").active)
         article.message.is-primary
             .message-header
                 p Account Status
@@ -15,5 +16,5 @@ block content
             .message-body
                 p Account is not activated
                 form(method="post", action="/resendactivationmail")
-                    input.input(name="user_id", type="hidden", value="#{currentUser.uuid}", required)
+                    input.input(name="user_id", type="hidden", value='#{req.session.get!AuthInfo("auth").userId}', required)
                     button.button(type="submit") Resend activation Mail

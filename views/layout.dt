@@ -21,7 +21,7 @@ html(lang="en", style="height: 100%;")
                 .navbar-start
                     a.navbar-item(href="/")
                         | Home
-                    - if (currentUser.loggedIn)
+                    - if (req.session)
                         a.navbar-item(href="/dashboard")
                             | Dashboard
                         a.navbar-item(href="/connections")
@@ -29,7 +29,7 @@ html(lang="en", style="height: 100%;")
                     a.navbar-item(href="/documentation")
                         | Documentation
                 .navbar-end
-                    - if (!currentUser.loggedIn)
+                    - if (!req.session)
                         .navbar-item
                             .buttons
                             a.button.is-primary(href="/register")
@@ -39,19 +39,19 @@ html(lang="en", style="height: 100%;")
                     - else
                         .navbar-item.has-dropdown.is-hoverable
                             a.navbar-link
-                                p=currentUser.name
+                                p Yolobert
                             .navbar-dropdown
                                 a.navbar-item(href="/settings")
                                     | Settings
                                 hr.navbar-divider
                                 a.navbar-item(href="/logout")
                                     strong Logout
-        -if(_error)
+        -if(error)
             article.message.is-danger
                 .message-header
                     p Error
                 .message-body
-                    p= _error
+                    p= error
         .columns(style="height: 100%;")
             .column
             .column.is-three-quarters.content

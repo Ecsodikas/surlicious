@@ -2,7 +2,7 @@ module controller.connectionscontroller;
 
 import vibe.vibe;
 
-import models.userdata;
+import models.authinfo;
 import models.connection;
 import database.database;
 import database.connectionstore;
@@ -10,64 +10,55 @@ import models.heartbeat;
 
 public class ConnectionsController
 {
-	UserData user;
-
-	public this(UserData user)
-	{
-		this.user = user;
-	}
-
-	void index(string _authUser)
+	void index(string userId)
 	{
 		ConnectionStore cs = Database.getConnectionStore();
-		Connections connections = cs.getConnections(_authUser);
-		auto currentUser = this.user;
-		string _error = null;
-		render!("connections.dt", currentUser, connections, _error);
+		Connections connections = cs.getConnections(userId);
+		string error = null;
+		render!("connections.dt", connections, error);
 	}
 
-	void getAddConnection(string _authUser, string _error)
+	void getAddConnection(string userId, string error)
 	{
-		auto currentUser = this.user;
 		ConnectionStore cs = Database.getConnectionStore();
-		Connections connections = cs.getConnections(_authUser);
-		render!("addconnection.dt", currentUser, connections, _error);
+		Connections connections = cs.getConnections(userId);
+		render!("addconnection.dt", connections, error);
 	}
 
-	void postSetConnectionStatus(HTTPServerRequest req, HTTPServerResponse res, string _authUser)
+	void postSetConnectionStatus(HTTPServerRequest req, HTTPServerResponse res, string userId)
 	{
 		auto formdata = req.form;
 		ConnectionStore cs = Database.getConnectionStore();
-		cs.setConnectionStatus(formdata.get("status"), _authUser, formdata.get("connection_id"));
+		cs.setConnectionStatus(formdata.get("status"), userId, formdata.get("connection_id"));
 		res.redirect("/connections");
 	}
 
-	void postAddConnection(HTTPServerRequest req, HTTPServerResponse res, string _authUser)
+	void postAddConnection(HTTPServerRequest req, HTTPServerResponse res, string userId)
 	{
 		auto formdata = req.form;
 
 		ConnectionStore cs = Database.getConnectionStore();
-		if (cs.getConnections(_authUser).connections.length < 5)
+		if (cs.getConnections(userId).connections.length < 5)
 		{
-			cs.addConnection(formdata.get("name"), _authUser);
+			cs.addConnection(formdata.get("name"), userId);
 			res.redirect("/connections");
 		}
 		throw new Exception("Maximum amount of connections reached.");
 	}
 
-	void postRemoveConnection(HTTPServerRequest req, HTTPServerResponse res, string _authUser) {
+	void postRemoveConnection(HTTPServerRequest req, HTTPServerResponse res, string userId) {
 		auto formdata = req.form;
 		BsonObjectID connectionId = BsonObjectID.fromString(formdata.get("connection_id"));
 		ConnectionStore cs = Database.getConnectionStore();
-		cs.removeConnection(connectionId, _authUser);
+		cs.removeConnection(connectionId, userId);
 		res.redirect("/connections");
 	}
 
-	void postRecreateApiKey(HTTPServerRequest req, HTTPServerResponse res, string _authUser)
+	void postRecreateApiKey(HTTPServerRequest req, HTTPServerResponse res, string userId)
 	{
 		auto formdata = req.form;
 		ConnectionStore cs = Database.getConnectionStore();
-		cs.recreateApiKey(formdata.get("api_key"), _authUser);
+		cs.recreateApiKey(formdata.get("api_key"), userId);
 		res.redirect("/connections");
 	}
 
@@ -75,5 +66,6 @@ public class ConnectionsController
 	{
 		ConnectionStore cs = Database.getConnectionStore();
 		cs.getConnectionsByHeartbeat(heartbeat);
+
 	}
 }

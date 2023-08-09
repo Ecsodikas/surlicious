@@ -2,33 +2,26 @@ module controller.usercontroller;
 
 import vibe.vibe;
 import models.user;
-import models.userdata;
+import models.authinfo;
 import database.userstore;
 import database.connectionstore;
 import database.database;
-import models.userdata;
 import models.connection;
 
 public class UserController
 {
-	UserData user;
-
-	public this(UserData user)
-	{
-		this.user = user;
-	}
 
 	void getLogin(string _error)
 	{
-		auto currentUser = this.user;
-		render!("login.dt", currentUser, _error);
+		string error = _error;
+		render!("login.dt", error);
 	}
 
 	public void validateAccount(string activationHash)
 	{
 		UserStore us = Database.getUserStore();
 		User u = us.getUserByActivationHash(activationHash);
-
+		
 		if(u.isActivated || u._id == BsonObjectID.init) {
 			//TODO: Error handling
 			redirect("login");
@@ -40,8 +33,8 @@ public class UserController
 
 	void getRegister(string _error)
 	{
-		auto currentUser = this.user;
-		render!("register.dt", currentUser, _error);
+		string error = _error;
+		render!("register.dt", error);
 	}
 
 	void getLogout()
@@ -78,19 +71,13 @@ public class UserController
 		UserStore us = Database.getUserStore();
 		User u = us.getUserByEmail(email);
 
-		if (u.email != "")
-		{
-			throw new Exception("Email already in use.");
-		}
+		enforce(u.email != "", "Email already in use.");
 
 		string password1 = formdata.get("password1");
 		string password2 = formdata.get("password2");
 		string name = formdata.get("name");
 
-		if (password1 != password2)
-		{
-			throw new Exception("Passwords do not match.");
-		}
+		enforce(password1 != password2, "Passwords do not match.");
 
 		int[] alphabet = [
 			1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
@@ -132,22 +119,23 @@ public class UserController
 		auto sha1 = new SHA1Digest();
 		string passwordHash = sha1.digest(password ~ u.salt).toHexString();
 
-		if (u.password == passwordHash)
+		enforce(u.password == passwordHash, "Invalid login credentials.");
+		
+		if (!req.session)
 		{
-			if (!req.session)
-			{
-				req.session = res.startSession();
-			}
-
-			UserData ud;
-			ud.loggedIn = true;
-			ud.name = u.name;
-			ud.isActive = u.isActivated;
-			ud.uuid = u._id.toString();
-
-			req.session.set!UserData("user", ud);
-			res.redirect("/dashboard");
+			req.session = res.startSession();
 		}
-		throw new Exception("Invalid login credentials.");
+
+		import models.authinfo;
+
+		AuthInfo ai;
+		ai.userId = u._id.toString();
+		ai.userName = u.name;
+		ai.active = u.isActivated;
+		ai.admin = false;
+		ai.premium = false;
+		
+		req.session.set!AuthInfo("auth", ai);
+		res.redirect("/dashboard");
 	}
 }

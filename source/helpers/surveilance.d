@@ -6,8 +6,10 @@ import controller.connectionscontroller;
 void sendAlertMails()
 {
 	import std.datetime;
+	logInfo("Sending alert mails...");
 	ConnectionsController cc = new ConnectionsController();
     cc.sendAlertMails();
+	logInfo("Sent alert mails!");
 }
 
 void initialisePeriodicSurveilance()
@@ -16,5 +18,5 @@ void initialisePeriodicSurveilance()
 	import vibe.core.core;
     sendAlertMails();
 	// start a periodic timer that prints the time every second
-	//setTimer(5.minutes, toDelegate(&sendAlertMails), true);
+	setTimer(5.minutes, toDelegate(&sendAlertMails), true);
 }

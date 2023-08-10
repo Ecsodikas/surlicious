@@ -20,17 +20,25 @@ public class ConnectionStore
         return this.mongoClient.getDatabase(this.databaseName)["UserConnections"];
     }
 
-    public MongoCollection getFlatLineConnections()
+    public Connections[] getFlatLineConnections()
     {
         import std;
 
         MongoCollection connections = this.getUserConnectionsCollection();
 
         long hnsecs = Clock.currStdTime();
-        long fiveMinutes = dur!"minutes"(5).total!"hnsecs";
+        long fiveMinutes = dur!"minutes"(10).total!"hnsecs";
         auto diff = hnsecs - fiveMinutes;
-  
-        return connections;
+
+        //TODO: Create DB sided filter
+        return connections
+            .find()
+            .map!(deserializeBson!Connections)
+            .map!(x => Connections(
+            x.user_id, 
+            x.api_key, 
+            x.connections.filter!(y => y.isActive && y.heartbeat < diff).array))
+            .array;
     }
 
     public void setConnectionStatus(string isActive, string userId, string connectionId)

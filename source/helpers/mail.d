@@ -6,6 +6,7 @@ import std.array;
 
 import vibe.vibe;
 import models.user;
+import models.connection;
 
 public static void sendActivationMail(User user)
 {
@@ -16,6 +17,20 @@ public static void sendActivationMail(User user)
         "Account activation",
         "Please click the following link to activate your account: " ~ activationURL
     );
+}
+
+public static void sendAlertMail(User user, Connections cons)
+{   
+    string flatlines = cons.connections.map!(x => x.name).join(", ");
+    
+    sendMailTo(
+        user,
+        "Alert: Flatlined Connections",
+        "The following connections flatlined: " ~ flatlines ~ "." ~ "\n" ~
+        "You will receive this email as long as your " ~
+        "connections do not receive a heartbeat or the connection is deactivated."
+    );
+    
 }
 
 private static void sendMailTo(User user, string subject, string content)
@@ -37,6 +52,13 @@ private static void sendMailTo(User user, string subject, string content)
     dchar[][] creds = f.byLine().map!array.array();
     ms.username = creds[0].to!string;
     ms.password = creds[1].to!string;
-
-    sendMail(ms, email);
+    try
+    {
+        sendMail(ms, email);
+    }
+    catch (Exception e)
+    {
+        logError("Couldn't send Emails: " ~ e.msg);
+    }
+    
 }

@@ -2,11 +2,16 @@ module controller.connectionscontroller;
 
 import vibe.vibe;
 
-import models.authinfo;
 import models.connection;
-import database.database;
-import database.connectionstore;
 import models.heartbeat;
+import models.authinfo;
+import models.user;
+
+import database.connectionstore;
+import database.userstore;
+import database.database;
+
+import helpers.mail;
 
 public class ConnectionsController
 {
@@ -46,7 +51,8 @@ public class ConnectionsController
 		throw new Exception("Maximum amount of connections reached.");
 	}
 
-	void postRemoveConnection(HTTPServerRequest req, HTTPServerResponse res, string userId) {
+	void postRemoveConnection(HTTPServerRequest req, HTTPServerResponse res, string userId)
+	{
 		auto formdata = req.form;
 		BsonObjectID connectionId = BsonObjectID.fromString(formdata.get("connection_id"));
 		ConnectionStore cs = Database.getConnectionStore();
@@ -69,8 +75,20 @@ public class ConnectionsController
 
 	}
 
-	void sendAlertMails() {
+	void sendAlertMails()
+	{
 		ConnectionStore cs = Database.getConnectionStore();
-		cs.getFlatLineConnections();
+		UserStore us = Database.getUserStore();
+		Connections[] conss = cs.getFlatLineConnections();
+		
+		foreach (Connections cons; conss)
+		{
+			if(cons.connections.length == 0) {
+				continue;
+			}
+			User u = us.getUserById(cons.user_id.toString());
+			sendAlertMail(u, cons);
+		}
+
 	}
 }

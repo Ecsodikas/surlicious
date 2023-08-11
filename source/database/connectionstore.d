@@ -91,7 +91,7 @@ public class ConnectionStore
     {
         MongoCollection connections = this.getUserConnectionsCollection();
 
-        auto r = connections.replaceOne([
+        connections.replaceOne([
             "user_id": BsonObjectID.fromString(userId),
             "connections._id": connectionId
         ],

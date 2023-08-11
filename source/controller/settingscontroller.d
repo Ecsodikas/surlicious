@@ -22,7 +22,7 @@ public class SettingsController
 		User u = us.getUserById(userId);
 
 		if(u.isActivated) {
-			redirect("/settings");
+			redirect("/");
 			return;	
 		}
 		DateTime now = Clock.currTime.to!DateTime;
@@ -31,7 +31,7 @@ public class SettingsController
 			sendActivationMail(u);
 			u.lastActivationMail = now;
 			us.updateLastActivationTime(u, now);
-			redirect("/settings");
+			redirect("/");
 			return;
 		}
 

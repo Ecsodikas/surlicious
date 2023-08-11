@@ -144,14 +144,15 @@ class SurliciousApplication
 		{
 			auto sc = new SettingsController();
 			sc.resendActivationMail(ai.userId);
+			terminateSession();
 		}
 
 		// Connections
 		@method(HTTPMethod.GET)
-		void connections(AuthInfo ai, HTTPServerRequest req)
+		void connections(AuthInfo ai, HTTPServerRequest req, string _error)
 		{
 			auto cc = new ConnectionsController();
-			cc.index(ai.userId);
+			cc.index(ai.userId, _error);
 		}
 
 		@method(HTTPMethod.GET)
@@ -166,12 +167,12 @@ class SurliciousApplication
 		@errorDisplay!getAddConnection void addconnection(AuthInfo ai, HTTPServerRequest req, HTTPServerResponse res)
 		{
 			auto cc = new ConnectionsController();
-			cc.postAddConnection(req, res, ai.userId);
+			cc.postAddConnection(req, res, ai);
 		}
 
 		@method(HTTPMethod.POST)
 		@path("removeconnection")
-		void removeConnection(AuthInfo ai, HTTPServerRequest req, HTTPServerResponse res)
+		@errorDisplay!connections void removeConnection(AuthInfo ai, HTTPServerRequest req, HTTPServerResponse res)
 		{
 			auto cc = new ConnectionsController();
 			cc.postRemoveConnection(req, res, ai.userId);
@@ -204,9 +205,8 @@ void main()
 	settings.bindAddresses = ["::1", "127.0.0.1"];
 	listenHTTP(settings, router);
 	logInfo("Please open http://127.0.0.1:8080/ in your browser.");
-	
 	import helpers.surveilance;
-	initialisePeriodicSurveilance();
+	//initialisePeriodicSurveilance();
 	
 	runApplication();
 }

@@ -15,11 +15,11 @@ import helpers.mail;
 
 public class ConnectionsController
 {
-	void index(string userId)
+	void index(string userId, string _error)
 	{
 		ConnectionStore cs = Database.getConnectionStore();
 		Connections connections = cs.getConnections(userId);
-		string error = null;
+		string error = _error;
 		render!("connections.dt", connections, error);
 	}
 
@@ -38,14 +38,16 @@ public class ConnectionsController
 		res.redirect("/connections");
 	}
 
-	void postAddConnection(HTTPServerRequest req, HTTPServerResponse res, string userId)
+	void postAddConnection(HTTPServerRequest req, HTTPServerResponse res, AuthInfo ai)
 	{
 		auto formdata = req.form;
 
+		enforce(ai.isActive(), "Account is not active. Please activate your account in the settings menu.");
+
 		ConnectionStore cs = Database.getConnectionStore();
-		if (cs.getConnections(userId).connections.length < 5)
+		if (cs.getConnections(ai.userId).connections.length < 5)
 		{
-			cs.addConnection(formdata.get("name"), userId);
+			cs.addConnection(formdata.get("name"), ai.userId);
 			res.redirect("/connections");
 		}
 		throw new Exception("Maximum amount of connections reached.");

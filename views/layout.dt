@@ -39,7 +39,8 @@ html(lang="en", style="height: 100%;")
                     - else
                         .navbar-item.has-dropdown.is-hoverable
                             a.navbar-link
-                                p Yolobert
+                                - import models.authinfo;
+                                p= req.session.get!AuthInfo("auth").userName
                             .navbar-dropdown
                                 a.navbar-item(href="/settings")
                                     | Settings

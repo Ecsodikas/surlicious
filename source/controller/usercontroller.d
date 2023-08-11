@@ -63,21 +63,18 @@ public class UserController
 
 		EmailStatus es = isEmail(email);
 
-		if (!es.valid)
-		{
-			throw new Exception("No valid email address.");
-		}
+		enforce(es.valid, "No valid email address.");
 
 		UserStore us = Database.getUserStore();
 		User u = us.getUserByEmail(email);
 
-		enforce(u.email != "", "Email already in use.");
+		enforce(u.email != email, "Email already in use.");
 
 		string password1 = formdata.get("password1");
 		string password2 = formdata.get("password2");
 		string name = formdata.get("name");
 
-		enforce(password1 != password2, "Passwords do not match.");
+		enforce(password1 == password2, "Passwords do not match.");
 
 		int[] alphabet = [
 			1, 2, 3, 4, 5, 6, 7, 8, 9, 10,

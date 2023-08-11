@@ -55,7 +55,7 @@ public class SettingsController
 			redirect(EnvData.getBaseUrl());
 			return;
 		}
-
+		redirect(EnvData.getBaseUrl());
 		//TODO: Error handling
 	}
 }

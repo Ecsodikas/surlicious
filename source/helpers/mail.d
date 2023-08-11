@@ -49,7 +49,7 @@ private static void sendMailTo(User user, string subject, string content)
     ms.connectionType = SMTPConnectionType.tls;
     ms.authType = SMTPAuthType.login;
     ms.tlsValidationMode = TLSPeerValidationMode.none;
-    File f = File(".mailcreds");
+    File f = File(".mailcreds", "r");
     dchar[][] creds = f.byLine().map!array.array();
     ms.username = creds[0].to!string;
     ms.password = creds[1].to!string;

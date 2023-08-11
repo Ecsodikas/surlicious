@@ -66,7 +66,7 @@ public class ConnectionStore
         long hnsecs = Clock.currStdTime();
 
         MongoCollection connections = this.getUserConnectionsCollection();
-        auto result = connections.replaceOne([
+        connections.replaceOne([
             "api_key": BsonObjectID.fromString(heartbeat.apiKey),
             "connections._id": BsonObjectID.fromString(heartbeat.connectionId)
         ], [

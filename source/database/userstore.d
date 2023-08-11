@@ -29,6 +29,21 @@ public class UserStore
         ["$set": ["isActivated": true]]);
     }
 
+    void updateUserPassword(BsonObjectID userId, string passwordHash, string salt)
+    {
+        MongoCollection users = this.mongoClient.getDatabase(this.databaseName)["Users"];
+
+        users.replaceOne([
+            "_id": userId
+        ],
+        ["$set": ["password": passwordHash]]);
+
+        users.replaceOne([
+            "_id": userId
+        ],
+        ["$set": ["salt": salt]]);
+    }
+
     User getUserByActivationHash(string activationHash)
     {
         MongoCollection users = this.mongoClient.getDatabase(this.databaseName)["Users"];
@@ -36,7 +51,8 @@ public class UserStore
             "activationHash": activationHash
         ]);
 
-        if(result.isNull) {
+        if (result.isNull)
+        {
             return User.init;
         }
 
@@ -58,10 +74,11 @@ public class UserStore
         return result.deserializeBson!User();
     }
 
-    void updateLastActivationTime(User u, DateTime time) {
+    void updateLastActivationTime(User u, DateTime time)
+    {
         MongoCollection users = this.mongoClient.getDatabase(this.databaseName)["Users"];
         users.replaceOne([
-            "_id": u._id 
+            "_id": u._id
         ],
         ["$set": ["lastActivationMail": time]]);
     }

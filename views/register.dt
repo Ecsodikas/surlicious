@@ -9,9 +9,6 @@ block content
                 label(for="email") Email
                 input.input(name="email", type="text", required)
             p 
-                label(for="email") Name
-                input.input(name="name", type="text", required)
-            p 
                 label(for="password1") Password
                 input.input(name="password1", type="password", required)
             p 

@@ -10,10 +10,28 @@ import helpers.mail;
 
 public class SettingsController
 {
-	void index()
+	void index(string _error)
 	{
-		string error = null;
+		string error = _error;
 		render!("settings.dt", error);
+	}
+
+	void changePassword(string userId, string oldPassword, string newPassword1, string newPassword2)
+	{
+		UserStore us = Database.getUserStore();
+		User u = us.getUserById(userId);
+
+		import helpers.password;
+		PasswordHelper.checkPassword(u, oldPassword);
+		enforce(newPassword1 == newPassword2, "The two new passwords do not match.");
+		
+		string[] passwordData = PasswordHelper.hashPassword(newPassword1);
+		string passwordHash = passwordData[0];
+		string salt = passwordData[1];
+
+		us.updateUserPassword(u._id, passwordHash, salt);
+		terminateSession();
+		redirect("/");
 	}
 
 	void resendActivationMail(string userId)
@@ -21,13 +39,15 @@ public class SettingsController
 		UserStore us = Database.getUserStore();
 		User u = us.getUserById(userId);
 
-		if(u.isActivated) {
+		if (u.isActivated)
+		{
 			redirect("/");
-			return;	
+			return;
 		}
 		DateTime now = Clock.currTime.to!DateTime;
 		auto time = Interval!DateTime(u.lastActivationMail, now);
-		if (time.length > dur!"minutes"(5)) {
+		if (time.length > dur!"minutes"(5))
+		{
 			sendActivationMail(u);
 			u.lastActivationMail = now;
 			us.updateLastActivationTime(u, now);

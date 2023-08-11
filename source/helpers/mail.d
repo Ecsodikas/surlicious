@@ -8,10 +8,12 @@ import vibe.vibe;
 import models.user;
 import models.connection;
 
+import helpers.env;
+
 public static void sendActivationMail(User user)
 {
     //TODO: Add base URL env
-    string activationURL = "http://127.0.0.1:8080/" ~ "validateaccount/" ~ user.activationHash;
+    string activationURL = EnvData.getBaseUrl() ~ "validateaccount/" ~ user.activationHash;
     sendMailTo(
         user,
         "Account activation",
@@ -38,9 +40,9 @@ private static void sendMailTo(User user, string subject, string content)
     Mail email = new Mail;
     email.headers["Date"] = Clock.currTime(PosixTimeZone.getTimeZone("Europe/Berlin"))
         .toRFC822DateTimeString();
-    email.headers["Sender"] = "Surlicious <exodiquas@exomie.eu>";
-    email.headers["From"] = "Surlicious <exodiquas@exomie.eu>";
-    email.headers["To"] = user.name ~ "<" ~ user.email ~ ">";
+    email.headers["Sender"] = "Surlicious <noreply@exomie.eu>";
+    email.headers["From"] = "Surlicious <noreply@exomie.eu>";
+    email.headers["To"] = user.email;
     email.headers["Subject"] = subject;
     email.bodyText = content;
 

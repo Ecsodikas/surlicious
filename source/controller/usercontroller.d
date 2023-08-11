@@ -21,14 +21,15 @@ public class UserController
 	{
 		UserStore us = Database.getUserStore();
 		User u = us.getUserByActivationHash(activationHash);
-		
+		import helpers.env;
+
 		if(u.isActivated || u._id == BsonObjectID.init) {
 			//TODO: Error handling
-			redirect("login");
+			redirect(EnvData.getBaseUrl() ~ "login");
 		}
 
 		us.activateAccount(activationHash);
-		redirect("login");
+		redirect(EnvData.getBaseUrl() ~ "login");
 	}
 
 	void getRegister(string _error)
@@ -45,53 +46,36 @@ public class UserController
 
 	void postRegister(HTTPServerRequest req, HTTPServerResponse res)
 	{
-		import std.digest.sha;
-		import std.digest.md;
 		import std.uuid;
-		import std.conv;
-		import std.stdio;
-		import std.algorithm;
-		import std.ascii;
-		import std.random;
-		import std.range;
 		import std.net.isemail;
-
+		import helpers.password;
 		import helpers.mail;
 
 		auto formdata = req.form;
 		string email = formdata.get("email");
 
 		EmailStatus es = isEmail(email);
-
 		enforce(es.valid, "No valid email address.");
 
 		UserStore us = Database.getUserStore();
 		User u = us.getUserByEmail(email);
-
 		enforce(u.email != email, "Email already in use.");
 
 		string password1 = formdata.get("password1");
 		string password2 = formdata.get("password2");
-		string name = formdata.get("name");
-
 		enforce(password1 == password2, "Passwords do not match.");
 
-		int[] alphabet = [
-			1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-			11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-			21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-			31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-			41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-		];
+		// passwordData[0] => hash, passwordData[1] => salt
+		string[] passwordData = PasswordHelper.hashPassword(password1);
 
-		string salt = iota(15).map!(_ => alphabet.choice()).array().to!string;
-		auto sha1 = new SHA1Digest();
-		string passwordHash = sha1.digest(password1 ~ salt).toHexString();
+		string passwordHash = passwordData[0];
+		string salt = passwordData[1];
+	
 		auto id = BsonObjectID.generate();
 
 		string activatonHash = randomUUID.toString();
 		DateTime now = Clock.currTime().to!DateTime;
-		User newUser = User(id, email, name, passwordHash, salt, false, activatonHash, now);
+		User newUser = User(id, email, passwordHash, salt, false, activatonHash, now);
 		us.storeUser(newUser);
 		sendActivationMail(newUser);
 		ConnectionStore cs = Database.getConnectionStore();
@@ -113,10 +97,8 @@ public class UserController
 		UserStore us = Database.getUserStore();
 		User u = us.getUserByEmail(email);
 
-		auto sha1 = new SHA1Digest();
-		string passwordHash = sha1.digest(password ~ u.salt).toHexString();
-
-		enforce(u.password == passwordHash, "Invalid login credentials.");
+		import helpers.password;
+		PasswordHelper.checkPassword(u, password);
 		
 		if (!req.session)
 		{
@@ -127,7 +109,7 @@ public class UserController
 
 		AuthInfo ai;
 		ai.userId = u._id.toString();
-		ai.userName = u.name;
+		ai.userName = u.email;
 		ai.active = u.isActivated;
 		ai.admin = false;
 		ai.premium = false;

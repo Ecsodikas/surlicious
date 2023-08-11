@@ -2,3 +2,16 @@ extends layout
 
 block content
     h1 Dashboard
+    .box
+        -if (!dashboardData.errors)
+            article.message.is-info
+                .message-header
+                    p Connection status
+                .message-body
+                    p All connections work as intended.
+        - else
+            article.message.is-warning
+                .message-header
+                    p Connection status
+                .message-body
+                    p There is something wrong with some connections.

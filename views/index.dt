@@ -4,4 +4,16 @@ block content
     h1 Surlicious
     h2 Don't trust your APIs!
     p Even we monitor Surlicious with Surlicious.
-    p Best tool to get alerts if your API is offline for a given period of time. lol
+
+    .box
+        h2 What is Surlicious?
+        p Surlicious is a tool to monitor the uptime from online services. The twist on Surlicious is the way the monitoring takes place. Your online service has to ping Surlicious in 5 minute periods. If so called "heartbeats" are missing, you get a email alert. That's it. Easy as cake!
+
+        h2 How to use Surlicious?
+        p 
+            | In the 
+            a(href="/documentation") documentation 
+            | menu point you can read how to setup Surlicious. But it only boils down to sending a POST request every 5 minutes at a given endpoint.
+        
+        h2 Where is your cookie consent banner???
+        p We do not track any data. So you can use this service in private. ❤

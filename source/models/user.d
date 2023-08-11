@@ -7,7 +7,6 @@ struct User
 {
     BsonObjectID _id;
     string email;
-    string name;
     string password;
     string salt;
     bool isActivated;

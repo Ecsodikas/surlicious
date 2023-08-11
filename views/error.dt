@@ -1,0 +1,8 @@
+extends layout
+
+block content
+    h1 Whoops!
+    - import std.conv;
+    .box.errorbox(style="text-align: center")
+        img(src="surlicious.png", style="max-width: 150px", alt="Eyi, the all seeing observer is watching you.") 
+        p(style="font-size: 2rem") It seems like the page you are looking for is not there. Either we have to surveil our tool better, or you have to check if you REALLY want to see this page.

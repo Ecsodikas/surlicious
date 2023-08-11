@@ -18,3 +18,19 @@ block content
                 form(method="post", action="/resendactivationmail")
                     input.input(name="user_id", type="hidden", value='#{req.session.get!AuthInfo("auth").userId}', required)
                     button.button(type="submit") Resend activation Mail
+    h2 Change Password
+    .box
+        form(method="post", action="/changepassword")
+            fieldset
+                legend 
+                p 
+                    label(for="oldpassword") Old password
+                    input.input(name="oldpassword", type="password", required)
+                p 
+                    label(for="newpassword1") New password
+                    input.input(name="newpassword1", type="password", required)
+                p 
+                    label(for="newpassword2") Repeat new password
+                    input.input(name="newpassword2", type="password", required)
+                p
+                    button.button(type="submit") Change password

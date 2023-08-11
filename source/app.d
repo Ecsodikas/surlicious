@@ -119,6 +119,7 @@ class SurliciousApplication
 			res.writeJsonBody(["heartbeat": "OK"]);
 		}
 	}
+	
 	// AUTHENTICATED ROUTES
 	// Dashboard
 	@anyAuth
@@ -132,10 +133,10 @@ class SurliciousApplication
 
 		// Settings
 		@method(HTTPMethod.GET)
-		void settings()
+		void settings(string _error)
 		{
 			auto sc = new SettingsController();
-			sc.index();
+			sc.index(_error);
 		}
 
 		@method(HTTPMethod.POST)
@@ -191,7 +192,21 @@ class SurliciousApplication
 			auto cc = new ConnectionsController();
 			cc.postSetConnectionStatus(req, res, ai.userId);
 		}
+
+		@method(HTTPMethod.POST)
+		@path("changepassword")
+		@errorDisplay!settings void changePassword(AuthInfo ai, string oldpassword, string newpassword1, string newpassword2)
+		{
+			auto sc = new SettingsController();
+			sc.changePassword(ai.userId, oldpassword, newpassword1, newpassword2);
+		}
 	}
+}
+
+void errorPage(HTTPServerRequest req, HTTPServerResponse res, HTTPServerErrorInfo errorInfo)
+{
+	string error = null;
+	res.render!("error.dt", req, error, errorInfo);
 }
 
 void main()
@@ -203,10 +218,12 @@ void main()
 	settings.sessionStore = new MemorySessionStore();
 	settings.port = 8080;
 	settings.bindAddresses = ["::1", "127.0.0.1"];
+	settings.errorPageHandler = toDelegate(&errorPage);
 	listenHTTP(settings, router);
 	logInfo("Please open http://127.0.0.1:8080/ in your browser.");
 	import helpers.surveilance;
+
 	//initialisePeriodicSurveilance();
-	
+
 	runApplication();
 }

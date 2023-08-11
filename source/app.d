@@ -225,7 +225,7 @@ void main()
 	settings.sessionStore = new MemorySessionStore();
 	settings.port = 8080;
 	settings.bindAddresses = ["0.0.0.0"];
-	settings.errorPageHandler = toDelegate(&errorPage);
+	//settings.errorPageHandler = toDelegate(&errorPage);
 	listenHTTP(settings, router);
 	import helpers.surveilance;
 

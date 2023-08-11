@@ -7,6 +7,8 @@ import database.userstore;
 import database.connectionstore;
 import database.database;
 import models.connection;
+import helpers.env;
+
 
 public class UserController
 {
@@ -41,7 +43,7 @@ public class UserController
 	void getLogout()
 	{
 		terminateSession();
-		redirect("/");
+		redirect(EnvData.getBaseUrl());
 	}
 
 	void postRegister(HTTPServerRequest req, HTTPServerResponse res)
@@ -81,7 +83,7 @@ public class UserController
 		ConnectionStore cs = Database.getConnectionStore();
 		cs.storeConnections(Connections(id, BsonObjectID.generate(), []));
 
-		redirect("/login");
+		redirect(EnvData.getBaseUrl() ~ "login");
 	}
 
 	void postLogin(HTTPServerRequest req, HTTPServerResponse res)
@@ -115,6 +117,6 @@ public class UserController
 		ai.premium = false;
 		
 		req.session.set!AuthInfo("auth", ai);
-		res.redirect("/dashboard");
+		res.redirect(EnvData.getBaseUrl() ~ "dashboard");
 	}
 }

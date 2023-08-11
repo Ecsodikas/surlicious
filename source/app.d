@@ -51,6 +51,13 @@ class SurliciousApplication
 			hc.index();
 		}
 
+		@method(HTTPMethod.GET)
+		void imprint()
+		{
+			auto hc = new HomeController();
+			hc.imprint();
+		}
+
 		// Documentation
 		@method(HTTPMethod.GET)
 		void documentation()
@@ -217,13 +224,12 @@ void main()
 	auto settings = new HTTPServerSettings;
 	settings.sessionStore = new MemorySessionStore();
 	settings.port = 8080;
-	settings.bindAddresses = ["::1", "127.0.0.1"];
+	settings.bindAddresses = ["0.0.0.0"];
 	settings.errorPageHandler = toDelegate(&errorPage);
 	listenHTTP(settings, router);
-	logInfo("Please open http://127.0.0.1:8080/ in your browser.");
 	import helpers.surveilance;
 
-	//initialisePeriodicSurveilance();
+	initialisePeriodicSurveilance();
 
 	runApplication();
 }

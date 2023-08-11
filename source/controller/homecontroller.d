@@ -4,10 +4,15 @@ import vibe.vibe;
 
 public class HomeController
 {
-    @method(HTTPMethod.GET)
     void index()
     {
         string error = null;
         render!("index.dt", error);
+    }
+
+    void imprint()
+    {
+        string error = null;
+        render!("imprint.dt", error);
     }
 }

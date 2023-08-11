@@ -12,7 +12,6 @@ import helpers.env;
 
 public static void sendActivationMail(User user)
 {
-    //TODO: Add base URL env
     string activationURL = EnvData.getBaseUrl() ~ "validateaccount/" ~ user.activationHash;
     sendMailTo(
         user,

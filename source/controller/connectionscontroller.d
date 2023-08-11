@@ -12,6 +12,7 @@ import database.userstore;
 import database.database;
 
 import helpers.mail;
+import helpers.env;
 
 public class ConnectionsController
 {
@@ -35,7 +36,7 @@ public class ConnectionsController
 		auto formdata = req.form;
 		ConnectionStore cs = Database.getConnectionStore();
 		cs.setConnectionStatus(formdata.get("status"), userId, formdata.get("connection_id"));
-		res.redirect("/connections");
+		res.redirect(EnvData.getBaseUrl() ~ "connections");
 	}
 
 	void postAddConnection(HTTPServerRequest req, HTTPServerResponse res, AuthInfo ai)
@@ -48,7 +49,7 @@ public class ConnectionsController
 		if (cs.getConnections(ai.userId).connections.length < 5)
 		{
 			cs.addConnection(formdata.get("name"), ai.userId);
-			res.redirect("/connections");
+			res.redirect(EnvData.getBaseUrl() ~ "connections");
 		}
 		throw new Exception("Maximum amount of connections reached.");
 	}
@@ -59,7 +60,7 @@ public class ConnectionsController
 		BsonObjectID connectionId = BsonObjectID.fromString(formdata.get("connection_id"));
 		ConnectionStore cs = Database.getConnectionStore();
 		cs.removeConnection(connectionId, userId);
-		res.redirect("/connections");
+		res.redirect(EnvData.getBaseUrl() ~ "connections");
 	}
 
 	void postRecreateApiKey(HTTPServerRequest req, HTTPServerResponse res, string userId)
@@ -67,7 +68,7 @@ public class ConnectionsController
 		auto formdata = req.form;
 		ConnectionStore cs = Database.getConnectionStore();
 		cs.recreateApiKey(formdata.get("api_key"), userId);
-		res.redirect("/connections");
+		res.redirect(EnvData.getBaseUrl() ~ "connections");
 	}
 
 	void postHeartbeat(Heartbeat heartbeat)
@@ -82,10 +83,11 @@ public class ConnectionsController
 		ConnectionStore cs = Database.getConnectionStore();
 		UserStore us = Database.getUserStore();
 		Connections[] conss = cs.getFlatLineConnections();
-		
+
 		foreach (Connections cons; conss)
 		{
-			if(cons.connections.length == 0) {
+			if (cons.connections.length == 0)
+			{
 				continue;
 			}
 			User u = us.getUserById(cons.user_id.toString());

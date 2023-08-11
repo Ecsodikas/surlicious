@@ -59,5 +59,9 @@ html(lang="en", style="height: 100%;")
                 block content
             .column
 
+    footer.footer
+        .content.has-text-centered
+            p Surlicious by eXodiquas
+            a(href="/imprint") Imprint
 
         

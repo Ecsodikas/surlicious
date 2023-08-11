@@ -2,3 +2,20 @@ extends layout
 
 block content
     h1 Documentation
+
+    .box
+        h2 How to set up Surlicious?
+        p 
+            | First of all, you have to register, then you have to login and visit the Connections tab. Afterwards you have create a connection. 
+            | After your connection is set up, you can copy and paste your API key and your connection ID and proceede with the following instructions.
+        p 
+            | Your application now has to POST against the following URL 
+            pre surlicious.exomie.eu/heartbeat
+            | with a JSON body like this
+        pre
+            |{
+            |    "apiKey": your API key,
+            |    "connectionId": your connection ID
+            |}
+        p 
+            | That's it. Now you get emails every time your service does not POST a heartbeat in a 5 minute interval to the Surlicious API.

@@ -7,6 +7,7 @@ import database.database;
 import database.userstore;
 import models.user;
 import helpers.mail;
+import helpers.env;
 
 public class SettingsController
 {
@@ -31,7 +32,7 @@ public class SettingsController
 
 		us.updateUserPassword(u._id, passwordHash, salt);
 		terminateSession();
-		redirect("/");
+		redirect(EnvData.getBaseUrl());
 	}
 
 	void resendActivationMail(string userId)
@@ -41,7 +42,7 @@ public class SettingsController
 
 		if (u.isActivated)
 		{
-			redirect("/");
+			redirect(EnvData.getBaseUrl());
 			return;
 		}
 		DateTime now = Clock.currTime.to!DateTime;
@@ -51,7 +52,7 @@ public class SettingsController
 			sendActivationMail(u);
 			u.lastActivationMail = now;
 			us.updateLastActivationTime(u, now);
-			redirect("/");
+			redirect(EnvData.getBaseUrl());
 			return;
 		}
 

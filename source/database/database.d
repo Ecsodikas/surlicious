@@ -3,18 +3,17 @@ module database.database;
 import vibe.vibe;
 import database.userstore;
 import database.connectionstore;
+import helpers.env;
 
 public class Database
 {
-    private static string connectionString = "mongodb://root:qwe123@localhost:8889";
-
     public static UserStore getUserStore() {
-        MongoClient client = connectMongoDB(Database.connectionString);
+        MongoClient client = connectMongoDB(EnvData.getDBConnectionString());
         return new UserStore(client);
     }
 
     public static ConnectionStore getConnectionStore() {
-        MongoClient client = connectMongoDB(Database.connectionString);
+        MongoClient client = connectMongoDB(EnvData.getDBConnectionString());
         return new ConnectionStore(client);
     }
 }

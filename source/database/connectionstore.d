@@ -29,10 +29,14 @@ public class ConnectionStore
         long hnsecs = Clock.currStdTime();
         long fiveMinutes = dur!"minutes"(10).total!"hnsecs";
         auto diff = hnsecs - fiveMinutes;
+        auto result = connections.find();
+
+        if(result.empty) {
+            return [];
+        }
 
         //TODO: Create DB sided filter
-        return connections
-            .find()
+        return result
             .map!(deserializeBson!Connections)
             .map!(x => Connections(
             x.user_id, 
@@ -78,6 +82,8 @@ public class ConnectionStore
         auto result = connections.findOne([
             "user_id": BsonObjectID.fromString(userId),
         ], FindOptions.init);
+        import std;
+        result.writeln;
 
         if (result.isNull)
         {

@@ -82,8 +82,6 @@ public class ConnectionStore
         auto result = connections.findOne([
             "user_id": BsonObjectID.fromString(userId),
         ], FindOptions.init);
-        import std;
-        result.writeln;
 
         if (result.isNull)
         {

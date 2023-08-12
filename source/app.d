@@ -19,7 +19,10 @@ import controller.usercontroller;
 import controller.dashboardcontroller;
 import controller.settingscontroller;
 import controller.connectionscontroller;
+
+// Helpers
 import helpers.mail;
+import helpers.env;
 
 @requiresAuth
 class SurliciousApplication
@@ -28,12 +31,15 @@ class SurliciousApplication
 	// Its return type can be injected into the routes of the associated service.
 	// (for obvious reasons this shouldn't be a route itself)
 	@noRoute
-	AuthInfo authenticate(scope HTTPServerRequest req, scope HTTPServerResponse res) @safe
+	AuthInfo authenticate(scope HTTPServerRequest req, scope HTTPServerResponse res)
 	{
-		if (!req.session || !req.session.isKeySet("auth"))
-			throw new HTTPStatusException(HTTPStatus.forbidden, "Not authorized to perform this action!");
-
-		return req.session.get!AuthInfo("auth");
+		if (req.session && req.session.isKeySet("auth"))
+		{
+			return req.session.get!AuthInfo("auth");
+		}
+		
+		redirect(EnvData.getBaseUrl());
+		throw new Exception("Something went wrong.");
 	}
 
 	private void getError(HTTPServerResponse res, string _error = null)
@@ -126,7 +132,7 @@ class SurliciousApplication
 			res.writeJsonBody(["heartbeat": "OK"]);
 		}
 	}
-	
+
 	// AUTHENTICATED ROUTES
 	// Dashboard
 	@anyAuth
@@ -225,11 +231,12 @@ void main()
 	settings.sessionStore = new MemorySessionStore();
 	settings.port = 8080;
 	settings.bindAddresses = ["0.0.0.0"];
+	settings.bindAddresses = ["127.0.0.1"];
 	settings.errorPageHandler = toDelegate(&errorPage);
 	listenHTTP(settings, router);
 	import helpers.surveilance;
 
-	initialisePeriodicSurveilance();
+	//initialisePeriodicSurveilance();
 	lowerPrivileges("exomie", "exomie");
 	runApplication();
 }

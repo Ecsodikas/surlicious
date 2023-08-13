@@ -9,6 +9,9 @@ block content
         h2 What is Surlicious?
         p Surlicious is a tool to monitor the uptime from online services. The twist on Surlicious is the way the monitoring takes place. Your online service has to ping Surlicious in 5 minute periods. If so called "heartbeats" are missing, you get a email alert. That's it. Easy as cake!
 
+        h2 How much is Surlicious?
+        p Surlicious is 100% free to use.
+
         h2 How to use Surlicious?
         p 
             | In the 

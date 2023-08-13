@@ -9,14 +9,25 @@ import models.user;
 import models.connection;
 
 import helpers.env;
+import models.resetcode;
 
 public static void sendActivationMail(User user)
 {
     string activationURL = EnvData.getBaseUrl() ~ "validateaccount/" ~ user.activationHash;
     sendMailTo(
-        user,
+        user.email,
         "Account activation",
         "Please click the following link to activate your account: " ~ activationURL
+    );
+}
+
+public static void sendForgotPasswordMail(ResetCode rc)
+{
+    string forgotPasswordURL = EnvData.getBaseUrl() ~ "resetpassword?token=" ~ rc.token;
+    sendMailTo(
+        rc.email,
+        "Password reset",
+        "Please click the following link to reset your password: " ~ forgotPasswordURL
     );
 }
 
@@ -25,7 +36,7 @@ public static void sendAlertMail(User user, Connections cons)
     string flatlines = cons.connections.map!(x => x.name).join(", ");
     
     sendMailTo(
-        user,
+        user.email,
         "Alert: Flatlined Connections",
         "The following connections flatlined: " ~ flatlines ~ "." ~ "\n" ~
         "You will receive this email as long as your " ~
@@ -34,14 +45,14 @@ public static void sendAlertMail(User user, Connections cons)
     
 }
 
-private static void sendMailTo(User user, string subject, string content)
+private static void sendMailTo(string usermail, string subject, string content)
 {
     Mail email = new Mail;
     email.headers["Date"] = Clock.currTime(PosixTimeZone.getTimeZone("Europe/Berlin"))
         .toRFC822DateTimeString();
     email.headers["Sender"] = "Surlicious <noreply@exomie.eu>";
     email.headers["From"] = "Surlicious <noreply@exomie.eu>";
-    email.headers["To"] = user.email;
+    email.headers["To"] = usermail;
     email.headers["Subject"] = subject;
     email.bodyText = content;
 

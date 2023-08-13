@@ -2,6 +2,7 @@ extends layout
 
 block content
     h1 Login
+    a(href="/forgotpassword") Forgot password
     form(method="post", action="/login")
         fieldset
             legend Please login to use the application

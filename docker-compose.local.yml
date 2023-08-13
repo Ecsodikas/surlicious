@@ -1,4 +1,3 @@
-# Use root/example as user/password credentials
 version: '3.1'
 
 services:
@@ -6,11 +5,13 @@ services:
     image: mongo
     restart: always
     ports:
-      - 8889:27017      
+      - 8889:27017     
+    volumes:
+      - surliciousdata:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: qwe123
-      MONGO_INITDB_DATABASE: "Surlicious"
+      MONGO_INITDB_DATABASE: Surlicious
 
   # surlicious:
   #   restart: always
@@ -34,4 +35,6 @@ services:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: qwe123
       ME_CONFIG_MONGODB_URL: mongodb://root:qwe123@mongo:27017/
-
+      
+volumes:
+  surliciousdata:

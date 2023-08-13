@@ -19,7 +19,10 @@ import controller.usercontroller;
 import controller.dashboardcontroller;
 import controller.settingscontroller;
 import controller.connectionscontroller;
+
+// Helpers
 import helpers.mail;
+import helpers.env;
 
 @requiresAuth
 class SurliciousApplication
@@ -28,12 +31,15 @@ class SurliciousApplication
 	// Its return type can be injected into the routes of the associated service.
 	// (for obvious reasons this shouldn't be a route itself)
 	@noRoute
-	AuthInfo authenticate(scope HTTPServerRequest req, scope HTTPServerResponse res) @safe
+	AuthInfo authenticate(scope HTTPServerRequest req, scope HTTPServerResponse res)
 	{
-		if (!req.session || !req.session.isKeySet("auth"))
-			throw new HTTPStatusException(HTTPStatus.forbidden, "Not authorized to perform this action!");
+		if (req.session && req.session.isKeySet("auth"))
+		{
+			return req.session.get!AuthInfo("auth");
+		}
 
-		return req.session.get!AuthInfo("auth");
+		redirect(EnvData.getBaseUrl());
+		throw new Exception("Something went wrong.");
 	}
 
 	private void getError(HTTPServerResponse res, string _error = null)
@@ -82,6 +88,41 @@ class SurliciousApplication
 		}
 
 		@method(HTTPMethod.GET)
+		@path("forgotpassword")
+		void getForgotPassword(string _error)
+		{
+			auto uc = new UserController();
+			uc.getForgotPassword(_error);
+		}
+
+		@method(HTTPMethod.POST)
+		@path("forgotpassword")
+		@errorDisplay!getForgotPassword void postForgotPassword(HTTPServerRequest req, HTTPServerResponse res, string email)
+		{
+			auto uc = new UserController();
+			uc.postForgotPassword(req, res, email);
+		}
+
+		@method(HTTPMethod.GET)
+		@path("resetpassword")
+		void getResetPassword(string _error, string token)
+		{
+			auto uc = new UserController();
+			uc.getResetPassword(_error, token);
+		}
+
+		@method(HTTPMethod.POST)
+		@path("resetpassword")
+		@errorDisplay!getResetPassword void postResetPassword(
+			string token,
+			string password1,
+			string password2)
+		{
+			auto uc = new UserController();
+			uc.postResetPassword(token, password1, password2);
+		}
+
+		@method(HTTPMethod.GET)
 		void logout()
 		{
 			auto uc = new UserController();
@@ -126,7 +167,7 @@ class SurliciousApplication
 			res.writeJsonBody(["heartbeat": "OK"]);
 		}
 	}
-	
+
 	// AUTHENTICATED ROUTES
 	// Dashboard
 	@anyAuth
@@ -225,6 +266,7 @@ void main()
 	settings.sessionStore = new MemorySessionStore();
 	settings.port = 8080;
 	settings.bindAddresses = ["0.0.0.0"];
+	//settings.bindAddresses = ["127.0.0.1"];
 	settings.errorPageHandler = toDelegate(&errorPage);
 	listenHTTP(settings, router);
 	import helpers.surveilance;

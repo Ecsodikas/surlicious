@@ -9,7 +9,7 @@ RUN wget --no-check-certificate https://master.dl.sourceforge.net/project/d-apt/
 RUN apt-get update --allow-insecure-repositories && apt-get -y --allow-unauthenticated install --reinstall d-apt-keyring
 RUN apt-get update --allow-insecure-repositories \
  && apt-get install -y --no-install-recommends --allow-unauthenticated dmd-compiler dub libcurl4-gnutls-dev libevent-dev libssl-dev \
- && apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/apt \
+ && apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/apt
 
 WORKDIR /src
 COPY . .

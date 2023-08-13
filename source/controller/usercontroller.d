@@ -1,14 +1,23 @@
 module controller.usercontroller;
 
+import std.uuid;
+import std.net.isemail;
+
 import vibe.vibe;
+
 import models.user;
 import models.authinfo;
+import models.resetcode;
+import models.connection;
+
 import database.userstore;
+import database.resetstore;
 import database.connectionstore;
 import database.database;
-import models.connection;
-import helpers.env;
 
+import helpers.env;
+import helpers.password;
+import helpers.mail;
 
 public class UserController
 {
@@ -25,7 +34,8 @@ public class UserController
 		User u = us.getUserByActivationHash(activationHash);
 		import helpers.env;
 
-		if(u.isActivated || u._id == BsonObjectID.init) {
+		if (u.isActivated || u._id == BsonObjectID.init)
+		{
 			//TODO: Error handling
 			redirect(EnvData.getBaseUrl() ~ "login");
 		}
@@ -48,11 +58,6 @@ public class UserController
 
 	void postRegister(HTTPServerRequest req, HTTPServerResponse res)
 	{
-		import std.uuid;
-		import std.net.isemail;
-		import helpers.password;
-		import helpers.mail;
-
 		auto formdata = req.form;
 		string email = formdata.get("email");
 
@@ -72,7 +77,7 @@ public class UserController
 
 		string passwordHash = passwordData[0];
 		string salt = passwordData[1];
-	
+
 		auto id = BsonObjectID.generate();
 
 		string activatonHash = randomUUID.toString();
@@ -100,8 +105,9 @@ public class UserController
 		User u = us.getUserByEmail(email);
 
 		import helpers.password;
+
 		PasswordHelper.checkPassword(u, password);
-		
+
 		if (!req.session)
 		{
 			req.session = res.startSession();
@@ -115,8 +121,64 @@ public class UserController
 		ai.active = u.isActivated;
 		ai.admin = false;
 		ai.premium = false;
-		
+
 		req.session.set!AuthInfo("auth", ai);
 		res.redirect(EnvData.getBaseUrl() ~ "dashboard");
+	}
+
+	void getForgotPassword(string error)
+	{
+		render!("forgotpassword.dt", error);
+	}
+
+	void postForgotPassword(HTTPServerRequest req, HTTPServerResponse res, string email)
+	{
+		UserStore us = Database.getUserStore();
+		User u = us.getUserByEmail(email);
+
+		enforce(u.email == email, "Something went wrong.");
+
+		ResetStore rs = Database.getResetStore();
+		ResetCode oldCode = rs.getResetCodeByMail(email);
+
+		if(oldCode.email == email) {
+			sendForgotPasswordMail(oldCode);
+		} else {
+			ResetCode rc = ResetCode(
+				BsonObjectID.generate(),
+				email,
+				randomUUID.toString()
+			);
+
+			rs.setResetCode(rc);
+			sendForgotPasswordMail(rc);
+		}
+
+		redirect(EnvData.getBaseUrl());
+	}
+
+	void getResetPassword(string _error, string token)
+	{
+		string error = _error;
+		render!("resetpassword.dt", error, token);
+	}
+
+	void postResetPassword(string token, string password1, string password2)
+	{
+		enforce(password1 == password2, "Passwords have to match.");
+		UserStore us = Database.getUserStore();
+		ResetStore rs = Database.getResetStore();
+
+		string[] passwordArray = PasswordHelper.hashPassword(password1);
+		string passwordHash = passwordArray[0];
+		string salt = passwordArray[1];
+
+		ResetCode rc = rs.getResetCodeByToken(token);
+		User u = us.getUserByEmail(rc.email);
+
+		us.updateUserPassword(u._id, passwordHash, salt);
+		rs.removeResetCode(rc);
+
+		redirect(EnvData.getBaseUrl() ~ "login");
 	}
 }

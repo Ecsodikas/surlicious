@@ -37,7 +37,7 @@ class SurliciousApplication
 		{
 			return req.session.get!AuthInfo("auth");
 		}
-		
+
 		redirect(EnvData.getBaseUrl());
 		throw new Exception("Something went wrong.");
 	}
@@ -85,6 +85,43 @@ class SurliciousApplication
 		{
 			auto uc = new UserController();
 			uc.postLogin(req, res);
+		}
+
+		@method(HTTPMethod.GET)
+		@path("forgotpassword")
+		void getForgotPassword(string _error)
+		{
+			auto uc = new UserController();
+			uc.getForgotPassword(_error);
+		}
+
+		@method(HTTPMethod.POST)
+		@path("forgotpassword")
+		@errorDisplay!getForgotPassword void postForgotPassword(HTTPServerRequest req, HTTPServerResponse res, string email)
+		{
+			auto uc = new UserController();
+			uc.postForgotPassword(req, res, email);
+		}
+
+		@method(HTTPMethod.GET)
+		@path("resetpassword")
+		void getResetPassword(string _error, string token)
+		{
+			auto uc = new UserController();
+			uc.getResetPassword(_error, token);
+		}
+
+		@method(HTTPMethod.POST)
+		@path("resetpassword")
+		@errorDisplay!getResetPassword void postResetPassword(
+			string token,
+			string password1,
+			string password2)
+		{
+			import std;
+			token.writeln;
+			auto uc = new UserController();
+			uc.postResetPassword(token, password1, password2);
 		}
 
 		@method(HTTPMethod.GET)

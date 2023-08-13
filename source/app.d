@@ -118,8 +118,6 @@ class SurliciousApplication
 			string password1,
 			string password2)
 		{
-			import std;
-			token.writeln;
 			auto uc = new UserController();
 			uc.postResetPassword(token, password1, password2);
 		}

@@ -6,7 +6,7 @@ class EnvData
 {
     public static string getBaseUrl()
     {
-        return environment.get("BASE_URL", "127.0.0.1:8080/");
+        return environment.get("BASE_URL", "http://127.0.0.1:8080/");
     }
 
         public static string getDBConnectionString()

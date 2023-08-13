@@ -10,7 +10,7 @@ Surlicious monitors a service from the outside by exposing an API endpoint that 
 
 ## How can I try it?
 
-Visit [Surlicious](surlicious.exomie.eu), register with your email address, verify your email address and you are ready to go.
+Visit [Surlicious](https://surlicious.exomie.eu), register with your email address, verify your email address and you are ready to go.
 
 ## Bugs
 

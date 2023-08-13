@@ -230,6 +230,6 @@ void main()
 	import helpers.surveilance;
 
 	initialisePeriodicSurveilance();
-	lowerPrivileges("exomie", "exomie");
+//	lowerPrivileges("exomie", "exomie");
 	runApplication();
 }

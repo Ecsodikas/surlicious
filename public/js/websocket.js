@@ -28,9 +28,11 @@ function connect()
 }
 
 function getBaseURL()
-{
-	var href = window.location.href.substring(7);
-    console.log(href);
+{   
+    const re = new RegExp("^https?://")
+	var href = window.location.href.replace(re, "");
 	var idx = href.indexOf("/");
 	return "ws://" + href.substring(0, idx);
 }
+
+connect();

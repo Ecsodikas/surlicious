@@ -23,6 +23,8 @@ import controller.connectionscontroller;
 // Helpers
 import helpers.mail;
 import helpers.env;
+import helpers.surveilance;
+import helpers.websockethandler;
 
 @requiresAuth
 class SurliciousApplication
@@ -50,6 +52,11 @@ class SurliciousApplication
 	// Home
 	@noAuth
 	{
+		@path("ws") void getWebsocket(scope WebSocket socket) {
+			WebSocketHandler wsh = new WebSocketHandler();
+			wsh.getWS(socket);
+		}
+
 		@method(HTTPMethod.GET)
 		void index()
 		{
@@ -266,12 +273,12 @@ void main()
 	settings.sessionStore = new MemorySessionStore();
 	settings.port = 8080;
 	settings.bindAddresses = ["0.0.0.0"];
-	//settings.bindAddresses = ["127.0.0.1"];
+	settings.bindAddresses = ["127.0.0.1"];
 	settings.errorPageHandler = toDelegate(&errorPage);
 	listenHTTP(settings, router);
-	import helpers.surveilance;
 
-	initialisePeriodicSurveilance();
+
+//	initialisePeriodicSurveilance();
 //	lowerPrivileges("exomie", "exomie");
 	runApplication();
 }

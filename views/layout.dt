@@ -6,10 +6,12 @@ html(lang="en", style="height: 100%;")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         meta(http-equiv="X-UA-Compatible", content="ie=edge")
         script(type='text/javascript', src='js/toastify.min.js')
+        script(type='text/javascript', src='js/websocket.js')
         link(rel='stylesheet', type='text/css', href='css/bulma.css')
         link(rel='stylesheet', type='text/css', href='css/toastify.min.css')
         title Surlicious
     body(style="height: 100%;")
+        #toastelement
         nav.navbar(role='navigation', aria-label="main navigation")
             .navbar-brand
                 a.navbar-item(href='/')

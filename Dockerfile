@@ -18,3 +18,4 @@ ENV PATH=/opt/dmd2/linux/bin64:$PATH
 
 WORKDIR /src
 COPY . .
+RUN dub build

@@ -1,5 +1,3 @@
-FROM ubuntu:latest
-
 RUN apt-get update --allow-insecure-repositories
 RUN apt-get install -y --no-install-recommends wget
 RUN apt-get install -y --no-install-recommends apt-utils
@@ -10,6 +8,8 @@ RUN apt-get update --allow-insecure-repositories && apt-get -y --allow-unauthent
 RUN apt-get update --allow-insecure-repositories \
  && apt-get install -y --no-install-recommends --allow-unauthenticated dmd-compiler dub libcurl4-gnutls-dev libevent-dev libssl-dev \
  && apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/apt
+FROM ubuntu:lunar AS build
+
 
 WORKDIR /src
 COPY . .

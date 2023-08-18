@@ -21,6 +21,15 @@ public static void sendActivationMail(User user)
     );
 }
 
+public static void sendNewAccountInformationMail()
+{
+    sendMailTo(
+        "exodiquas@gmail.com",
+        "New User",
+        "New user registered. YAY!"
+    );
+}
+
 public static void sendForgotPasswordMail(ResetCode rc)
 {
     string forgotPasswordURL = EnvData.getBaseUrl() ~ "resetpassword?token=" ~ rc.token;

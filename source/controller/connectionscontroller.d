@@ -21,14 +21,16 @@ public class ConnectionsController
 		ConnectionStore cs = Database.getConnectionStore();
 		Connections connections = cs.getConnections(userId);
 		string error = _error;
-		render!("connections.dt", connections, error);
+		string success = null;
+		render!("connections.dt", connections, error, success);
 	}
 
 	void getAddConnection(string userId, string error)
 	{
 		ConnectionStore cs = Database.getConnectionStore();
 		Connections connections = cs.getConnections(userId);
-		render!("addconnection.dt", connections, error);
+		string success = null;
+		render!("addconnection.dt", connections, error, success);
 	}
 
 	void postSetConnectionStatus(HTTPServerRequest req, HTTPServerResponse res, string userId)
@@ -36,7 +38,7 @@ public class ConnectionsController
 		auto formdata = req.form;
 		ConnectionStore cs = Database.getConnectionStore();
 		cs.setConnectionStatus(formdata.get("status"), userId, formdata.get("connection_id"));
-		res.redirect(EnvData.getBaseUrl() ~ "connections");
+		redirect(EnvData.getBaseUrl() ~ "connections");
 	}
 
 	void postAddConnection(HTTPServerRequest req, HTTPServerResponse res, AuthInfo ai)
@@ -46,10 +48,14 @@ public class ConnectionsController
 		enforce(ai.isActive(), "Account is not active. Please activate your account in the settings menu.");
 
 		ConnectionStore cs = Database.getConnectionStore();
-		if (cs.getConnections(ai.userId).connections.length < 5)
+		Connections connections = cs.getConnections(ai.userId);
+		if (connections.connections.length < 5)
 		{
 			cs.addConnection(formdata.get("name"), ai.userId);
-			res.redirect(EnvData.getBaseUrl() ~ "connections");
+			connections = cs.getConnections(ai.userId);
+			string error = null;
+			string success = "Connection added successfully.";
+			render!("connections.dt", connections, error, success);
 		}
 		throw new Exception("Maximum amount of connections reached.");
 	}
@@ -60,7 +66,10 @@ public class ConnectionsController
 		BsonObjectID connectionId = BsonObjectID.fromString(formdata.get("connection_id"));
 		ConnectionStore cs = Database.getConnectionStore();
 		cs.removeConnection(connectionId, userId);
-		res.redirect(EnvData.getBaseUrl() ~ "connections");
+		string error = null;
+		string success = "Connection removed successfully.";
+		Connections connections = cs.getConnections(userId);
+		render!("connections.dt", connections, error, success);
 	}
 
 	void postRecreateApiKey(HTTPServerRequest req, HTTPServerResponse res, string userId)
@@ -68,14 +77,16 @@ public class ConnectionsController
 		auto formdata = req.form;
 		ConnectionStore cs = Database.getConnectionStore();
 		cs.recreateApiKey(formdata.get("api_key"), userId);
-		res.redirect(EnvData.getBaseUrl() ~ "connections");
+		string error = null;
+		string success = "API-key was recreated successfully.";
+		Connections connections = cs.getConnections(userId);
+		render!("connections.dt", connections, error, success);
 	}
 
 	void postHeartbeat(Heartbeat heartbeat)
 	{
 		ConnectionStore cs = Database.getConnectionStore();
 		cs.getConnectionsByHeartbeat(heartbeat);
-
 	}
 
 	void sendAlertMails()

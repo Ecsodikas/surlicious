@@ -11,6 +11,7 @@ import models.connection;
 import models.user;
 import models.authinfo;
 import models.heartbeat;
+import models.toast;
 
 // Controllers
 import controller.homecontroller;
@@ -24,7 +25,7 @@ import controller.connectionscontroller;
 import helpers.mail;
 import helpers.env;
 import helpers.surveilance;
-import helpers.websockethandler;
+import core.stdc.wctype;
 
 @requiresAuth
 class SurliciousApplication
@@ -52,11 +53,6 @@ class SurliciousApplication
 	// Home
 	@noAuth
 	{
-		@path("ws") void getWebsocket(scope WebSocket socket) {
-			WebSocketHandler wsh = new WebSocketHandler();
-			wsh.getWS(socket);
-		}
-
 		@method(HTTPMethod.GET)
 		void index()
 		{
@@ -188,10 +184,10 @@ class SurliciousApplication
 
 		// Settings
 		@method(HTTPMethod.GET)
-		void settings(string _error)
+		void settings(string _error, HTTPServerRequest req)
 		{
 			auto sc = new SettingsController();
-			sc.index(_error);
+			sc.index(_error, req);
 		}
 
 		@method(HTTPMethod.POST)
@@ -199,7 +195,7 @@ class SurliciousApplication
 		void resendActivationMail(AuthInfo ai, HTTPServerRequest req, HTTPServerResponse res)
 		{
 			auto sc = new SettingsController();
-			sc.resendActivationMail(ai.userId);
+			sc.resendActivationMail(res, req, ai.userId);
 			terminateSession();
 		}
 
@@ -250,10 +246,16 @@ class SurliciousApplication
 
 		@method(HTTPMethod.POST)
 		@path("changepassword")
-		@errorDisplay!settings void changePassword(AuthInfo ai, string oldpassword, string newpassword1, string newpassword2)
+		@errorDisplay!settings void changePassword(
+			HTTPServerResponse res,
+			HTTPServerRequest req,
+			AuthInfo ai,
+			string oldpassword,
+			string newpassword1,
+			string newpassword2)
 		{
 			auto sc = new SettingsController();
-			sc.changePassword(ai.userId, oldpassword, newpassword1, newpassword2);
+			sc.changePassword(res, req, ai.userId, oldpassword, newpassword1, newpassword2);
 		}
 	}
 }
@@ -261,7 +263,8 @@ class SurliciousApplication
 void errorPage(HTTPServerRequest req, HTTPServerResponse res, HTTPServerErrorInfo errorInfo)
 {
 	string error = null;
-	res.render!("error.dt", req, error, errorInfo);
+	string success = null;
+	res.render!("error.dt", req, error, success, errorInfo);
 }
 
 void main()
@@ -277,8 +280,7 @@ void main()
 	settings.errorPageHandler = toDelegate(&errorPage);
 	listenHTTP(settings, router);
 
-
-//	initialisePeriodicSurveilance();
-//	lowerPrivileges("exomie", "exomie");
+	//	initialisePeriodicSurveilance();
+	//	lowerPrivileges("exomie", "exomie");
 	runApplication();
 }

@@ -8,6 +8,7 @@ public class DocumentationController
     void index()
     {
         string error = null;
-        render!("documentation.dt", error);
+        string success = null;
+        render!("documentation.dt", error, success);
     }
 }

@@ -1,7 +1,6 @@
 module controller.dashboardcontroller;
 
 import vibe.vibe;
-
 import models.authinfo;
 import models.dashboarddata;
 
@@ -14,7 +13,8 @@ public class DashboardController
 	void index()
 	{
 		string error = null;
+		string success = null;
 		DashboardData dashboardData = this.generateDashboardData();
-		render!("dashboard.dt", error, dashboardData);
+		render!("dashboard.dt", error, success, dashboardData);
 	}
 }

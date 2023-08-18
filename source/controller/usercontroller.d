@@ -25,7 +25,8 @@ public class UserController
 	void getLogin(string _error)
 	{
 		string error = _error;
-		render!("login.dt", error);
+		string success = null;
+		render!("login.dt", error, success);
 	}
 
 	public void validateAccount(string activationHash)
@@ -41,13 +42,17 @@ public class UserController
 		}
 
 		us.activateAccount(activationHash);
-		redirect(EnvData.getBaseUrl() ~ "login");
+
+		string error = null;
+		string success = "Account validated.";
+		render!("login.dt", error, success);
 	}
 
 	void getRegister(string _error)
 	{
 		string error = _error;
-		render!("register.dt", error);
+		string success = null;
+		render!("register.dt", error, success);
 	}
 
 	void getLogout()
@@ -88,7 +93,12 @@ public class UserController
 		ConnectionStore cs = Database.getConnectionStore();
 		cs.storeConnections(Connections(id, BsonObjectID.generate(), []));
 
-		redirect(EnvData.getBaseUrl() ~ "login");
+		sendNewAccountInformationMail();
+
+		string error = null;
+		string success = "Registered successfully. 
+		Please check your email account for further instructions on account validation.";
+		render!("login.dt", error, success);
 	}
 
 	void postLogin(HTTPServerRequest req, HTTPServerResponse res)
@@ -123,12 +133,15 @@ public class UserController
 		ai.premium = false;
 
 		req.session.set!AuthInfo("auth", ai);
-		res.redirect(EnvData.getBaseUrl() ~ "dashboard");
+		string error = null;
+		string success = "Logged in successfully.";
+		render!("index.dt", error, success);
 	}
 
 	void getForgotPassword(string error)
 	{
-		render!("forgotpassword.dt", error);
+		string success = null;
+		render!("forgotpassword.dt", error, success);
 	}
 
 	void postForgotPassword(HTTPServerRequest req, HTTPServerResponse res, string email)
@@ -154,13 +167,17 @@ public class UserController
 			sendForgotPasswordMail(rc);
 		}
 
-		redirect(EnvData.getBaseUrl());
+		string error = null;
+		string success = "Password reset process started.
+		Please check your email account for further instructions on the password reset process.";
+		render!("index.dt", error, success);
 	}
 
 	void getResetPassword(string _error, string token)
 	{
 		string error = _error;
-		render!("resetpassword.dt", error, token);
+		string success = null;
+		render!("resetpassword.dt", error, success, token);
 	}
 
 	void postResetPassword(string token, string password1, string password2)
@@ -179,6 +196,8 @@ public class UserController
 		us.updateUserPassword(u._id, passwordHash, salt);
 		rs.removeResetCode(rc);
 
-		redirect(EnvData.getBaseUrl() ~ "login");
+		string error = null;
+		string success = "Password reset successfully.";
+		render!("login.dt", error, success);
 	}
 }

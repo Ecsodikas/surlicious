@@ -7,12 +7,14 @@ public class HomeController
     void index()
     {
         string error = null;
-        render!("index.dt", error);
+        string success = null;
+        render!("index.dt", error, success);
     }
 
     void imprint()
     {
         string error = null;
-        render!("imprint.dt", error);
+        string success = null;
+        render!("imprint.dt", error, success);
     }
 }

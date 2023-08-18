@@ -11,51 +11,58 @@ import helpers.env;
 
 public class SettingsController
 {
-	void index(string _error)
+	void index(string _error, HTTPServerRequest req)
 	{
 		string error = _error;
-		render!("settings.dt", error);
+		string success = null;
+		render!("settings.dt", error, success);
 	}
 
-	void changePassword(string userId, string oldPassword, string newPassword1, string newPassword2)
+	void changePassword(
+		HTTPServerResponse res,
+		HTTPServerRequest req,
+		string userId,
+		string oldPassword,
+		string newPassword1,
+		string newPassword2)
 	{
 		UserStore us = Database.getUserStore();
 		User u = us.getUserById(userId);
 
 		import helpers.password;
+
 		PasswordHelper.checkPassword(u, oldPassword);
 		enforce(newPassword1 == newPassword2, "The two new passwords do not match.");
-		
+
 		string[] passwordData = PasswordHelper.hashPassword(newPassword1);
 		string passwordHash = passwordData[0];
 		string salt = passwordData[1];
 
 		us.updateUserPassword(u._id, passwordHash, salt);
 		terminateSession();
-		redirect(EnvData.getBaseUrl());
+		string error = null;
+		string success = "Password was changed successfully.";
+		res.render!("index.dt", req, error, success);
 	}
 
-	void resendActivationMail(string userId)
+	void resendActivationMail(HTTPServerResponse res, HTTPServerRequest req, string userId)
 	{
 		UserStore us = Database.getUserStore();
 		User u = us.getUserById(userId);
 
-		if (u.isActivated)
-		{
-			redirect(EnvData.getBaseUrl());
-			return;
-		}
+		enforce(!u.isActivated, "Account already active.");
 		DateTime now = Clock.currTime.to!DateTime;
 		auto time = Interval!DateTime(u.lastActivationMail, now);
-		if (time.length > dur!"minutes"(5))
-		{
-			sendActivationMail(u);
-			u.lastActivationMail = now;
-			us.updateLastActivationTime(u, now);
-			redirect(EnvData.getBaseUrl());
-			return;
-		}
-		redirect(EnvData.getBaseUrl());
-		//TODO: Error handling
+		enforce(
+			time.length > dur!"minutes"(5),
+			"Last activation email was sent less than 5 minutes ago. Please wait."
+		);
+
+		//sendActivationMail(u);
+		u.lastActivationMail = now;
+		us.updateLastActivationTime(u, now);
+		string error = null;
+		string success = "Activation mail was sent successfully.";
+		res.render!("index.dt", error, req, success);
 	}
 }

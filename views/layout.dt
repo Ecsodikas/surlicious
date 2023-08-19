@@ -50,21 +50,21 @@ html(lang="en", style="height: 100%;")
                                 hr.navbar-divider
                                 a.navbar-item(href="/logout")
                                     strong Logout
-        - if(success)
-            article.message.is-success
-                .message-header
-                    p Success
-                .message-body
-                    p= success
-        -if(error)
-            article.message.is-danger
-                .message-header
-                    p Error
-                .message-body
-                    p= error
         .columns(style="height: 100%;")
             .column
             .column.is-three-quarters.content
+                - if(success)
+                    article.message.is-success
+                        .message-header
+                            p Success
+                        .message-body
+                            p= success
+                -if(error)
+                    article.message.is-danger
+                        .message-header
+                            p Error
+                        .message-body
+                            p= error
                 block content
             .column
     footer.footer

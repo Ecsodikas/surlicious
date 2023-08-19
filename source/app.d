@@ -280,7 +280,7 @@ void main()
 	settings.errorPageHandler = toDelegate(&errorPage);
 	listenHTTP(settings, router);
 
-	//	initialisePeriodicSurveilance();
+	initialisePeriodicSurveilance();
 	//	lowerPrivileges("exomie", "exomie");
 	runApplication();
 }

@@ -38,7 +38,10 @@ public class ConnectionsController
 		auto formdata = req.form;
 		ConnectionStore cs = Database.getConnectionStore();
 		cs.setConnectionStatus(formdata.get("status"), userId, formdata.get("connection_id"));
-		redirect(EnvData.getBaseUrl() ~ "connections");
+		Connections connections = cs.getConnections(userId);
+		string error = null;
+		string success = "Connection status changed successfully.";
+		render!("connections.dt", connections, error, success);
 	}
 
 	void postAddConnection(HTTPServerRequest req, HTTPServerResponse res, AuthInfo ai)

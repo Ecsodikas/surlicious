@@ -276,11 +276,11 @@ void main()
 	settings.sessionStore = new MemorySessionStore();
 	settings.port = 8080;
 	settings.bindAddresses = ["0.0.0.0"];
-	settings.bindAddresses = ["127.0.0.1"];
+	//settings.bindAddresses = ["127.0.0.1"];
 	settings.errorPageHandler = toDelegate(&errorPage);
 	listenHTTP(settings, router);
 
-	initialisePeriodicSurveilance();
-	//	lowerPrivileges("exomie", "exomie");
+	//initialisePeriodicSurveilance();
+	//lowerPrivileges("exomie", "exomie");
 	runApplication();
 }

@@ -69,7 +69,5 @@ html(lang="en", style="height: 100%;")
             .column
     footer.footer
         .content.has-text-centered
-            p Surlicious by eXodiquas
+            p Surlicious by Ecsodikas
             a(href="/imprint") Imprint
-
-        

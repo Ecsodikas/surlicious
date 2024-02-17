@@ -10,7 +10,7 @@ block content
             | After your connection is set up, you can copy and paste your API key and your connection ID and proceede with the following instructions.
         p 
             | Your application now has to POST against the following URL 
-            pre https://surlicious.exomie.eu/heartbeat
+            pre https://surlicious.ecsodikas.eu/heartbeat
             | with a JSON body like this
         pre
             |{

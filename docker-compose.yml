@@ -19,8 +19,8 @@ services:
       - 8888:8080
     entrypoint: dub
     environment:
-      VIRTUAL_HOST: surlicious.exomie.eu
-      LETSENCRYPT_HOST: surlicious.exomie.eu
+      VIRTUAL_HOST: surlicious.ecsodikas.eu
+      LETSENCRYPT_HOST: surlicious.ecsodikas.eu
       LETSENCRYPT_EMAIL: exodiquas@gmail.com
     build:
       context: .

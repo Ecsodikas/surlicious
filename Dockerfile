@@ -1,14 +1,23 @@
-FROM ubuntu:latest
+FROM ubuntu:lunar AS build
+
+RUN apt-get -y update && \
+    apt-get -y install curl xz-utils build-essential libssl-dev && \
+    apt-get -y clean && rm -rf /var/lib/apt/lists/* /var/cache/apt
+
+WORKDIR /opt
+
+ENV DMD_MAJOR_VERSION=2 \
+    DMD_MINOR_VERSION=105.0
+ENV DMD_VERSION=$DMD_MAJOR_VERSION.$DMD_MINOR_VERSION
+
+RUN curl https://downloads.dlang.org/releases/$DMD_MAJOR_VERSION.x/$DMD_VERSION/dmd.$DMD_VERSION.linux.tar.xz -o dmd.tar.xz && \
+    tar xJf dmd.tar.xz && \
+    rm dmd.tar.xz
+
+ENV PATH=/opt/dmd2/linux/bin64:$PATH
 
 WORKDIR /src
 COPY . .
-RUN apt-get update --allow-insecure-repositories
-RUN apt-get install -y --no-install-recommends wget
-RUN apt-get install -y --no-install-recommends apt-utils
-RUN apt-get install -y --no-install-recommends ca-certificates
-RUN apt-get install -y --no-install-recommends tzdata
-RUN wget --no-check-certificate https://master.dl.sourceforge.net/project/d-apt/files/d-apt.list -O /etc/apt/sources.list.d/d-apt.list
-RUN apt-get update --allow-insecure-repositories && apt-get -y --allow-unauthenticated install --reinstall d-apt-keyring
-RUN apt-get update --allow-insecure-repositories \
- && apt-get install -y --no-install-recommends --allow-unauthenticated dmd-compiler dub libcurl4-gnutls-dev libevent-dev libssl-dev \
- && apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/apt \
+RUN dub build
+
+CMD ["./surlicious"]
